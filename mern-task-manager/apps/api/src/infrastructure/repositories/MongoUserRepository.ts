@@ -1,6 +1,6 @@
-import { UserRepository } from '../../domain/user/UserRepository.js'
 import { User } from '../../domain/user/User.js'
 import { UserModel } from '../models/UserModel.js'
+import { UserRepository } from '../../domain/user/UserRepository.js'
 
 export class MongoUserRepository implements UserRepository {
 
@@ -78,13 +78,13 @@ export class MongoUserRepository implements UserRepository {
   }
 
   async update(user: User): Promise<void> {
-  await UserModel.updateOne(
-    { _id: user.id },
-    {
-      $set: {
-        email: user.email,
-        role: user.role
-      }
-    })
+    await UserModel.updateOne(
+      { _id: user.id },
+      {
+        $set: {
+          email: user.email,
+          role: user.role
+        }
+      })
   }
 }

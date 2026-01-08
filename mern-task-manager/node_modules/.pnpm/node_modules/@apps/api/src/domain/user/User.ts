@@ -9,7 +9,7 @@ export type UserProps = {
 }
 
 export class User {
-  private constructor(private readonly props: UserProps) {}
+  private constructor(private readonly props: UserProps) { }
 
   get id() {
     return this.props.id
@@ -17,6 +17,10 @@ export class User {
 
   get email() {
     return this.props.email
+  }
+
+  get passwordHash() {
+    return this.props.passwordHash
   }
 
   get role() {
@@ -28,10 +32,10 @@ export class User {
   }
 
   updateEmail(email: string) {
-  if (!email.includes('@')) {
-    throw new Error('Invalid email')
-  }
-  this.props.email = email
+    if (!email.includes('@')) {
+      throw new Error('Invalid email')
+    }
+    this.props.email = email
   }
 
   updateRole(role: 'user' | 'admin') {

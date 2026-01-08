@@ -6,12 +6,12 @@ import { PasswordHasher } from '../security/PasswordHasher.js'
 
 export class RegisterUserHandler {
   constructor(
-    private readonly userRepo: UserRepository,
+    private readonly userRepository: UserRepository,
     private readonly passwordHasher: PasswordHasher
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<void> {
-    const existing = await this.userRepo.findByEmail(command.email)
+    const existing = await this.userRepository.findByEmail(command.email)
 
     if (existing) {
       throw new UserAlreadyExistsError(command.email)
@@ -25,6 +25,6 @@ export class RegisterUserHandler {
       passwordHash
     })
 
-    await this.userRepo.save(user)
+    await this.userRepository.save(user)
   }
 }
