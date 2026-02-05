@@ -17,6 +17,12 @@ import { SoftDeleteUserController } from './controllers/SoftDeleteUserController
 import { JwtTokenService } from '../infrastructure/security/JwtTokenService.js'
 import { LoginHandler } from '../application/auth/commands/LoginHandler.js'
 import { LoginController } from './controllers/LoginController.js'
+import { JwtTokenVerifier } from '../infrastructure/security/JwtTokenVerifier.js'
+import { authMiddleware } from './middlewares/auth.middleware.js'
+import { MongoTaskRepository } from '../infrastructure/repositories/MongoTaskRepository.js'
+import { CreateTaskHandler } from '../application/tasks/commands/CreateTaskHandler.js'
+import { TaskController } from './controllers/TaskController.js'
+import { tasksRouter } from './routes/tasks.routes.js'
 
 export function createServer() {
   const app = express()
@@ -30,8 +36,12 @@ export function createServer() {
 
   // dependencies
   const userRepository = new MongoUserRepository()
+  const taskRepository = new MongoTaskRepository()
   const passwordHasher = new BcryptPasswordHasher()
   const tokenService = new JwtTokenService(jwtSecret)
+  const tokenVerifier = new JwtTokenVerifier(jwtSecret)
+  
+  const auth = authMiddleware(tokenVerifier)
 
   // handlers
   const registerUserHandler = new RegisterUserHandler(
@@ -47,6 +57,7 @@ export function createServer() {
     passwordHasher,
     tokenService
   )
+  const createTaskHandler = new CreateTaskHandler(taskRepository)
 
   // controllers
   const registerUserController = new RegisterUserController(
@@ -61,10 +72,12 @@ export function createServer() {
     softDeleteUserHandler
   )
   const loginController = new LoginController(loginHandler)
-
+  const taskController = new TaskController(createTaskHandler)
+  
   // routes
   app.use('/health', healthRouter)
   app.use('/users',
+    auth,
     createUsersRouter(
       getUserByIdController,
       listUsersController,
@@ -72,6 +85,7 @@ export function createServer() {
       softDeleteUserController
     )
   )
+  app.use('/tasks', tasksRouter(taskController))
   app.use('/auth',
     createAuthRouter(
       registerUserController,

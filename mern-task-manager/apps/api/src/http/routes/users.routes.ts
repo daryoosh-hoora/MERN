@@ -3,6 +3,8 @@ import { GetUserByIdController } from '../controllers/GetUserByIdController.js'
 import { ListUsersController } from '../controllers/ListUsersController.js'
 import { UpdateUserController } from '../controllers/UpdateUserController.js'
 import { SoftDeleteUserController } from '../controllers/SoftDeleteUserController.js'
+import { authorize } from '../middlewares/authorize.middleware.js'
+import { authorizeSelfOrAdmin } from '../middlewares/authorizeSelfOrAdmin.middleware.js'
 
 export function createUsersRouter(
   getUserByIdController: GetUserByIdController,
@@ -24,8 +26,23 @@ export function createUsersRouter(
     updateUserController.handle(req, res)
   )
 
-  router.delete('/:id', (req, res) =>
-    softDeleteUserController.handle(req, res)
+  // admin only
+  router.put(
+    '/:id',
+    authorize('admin'),
+    (req, res) => updateUserController.handle(req, res)
+  )
+
+  router.put(
+    '/:id',
+    authorizeSelfOrAdmin(),
+    (req, res) => updateUserController.handle(req, res)
+  )
+
+  router.delete(
+    '/:id',
+    authorize('admin'),
+    (req, res) => softDeleteUserController.handle(req, res)
   )
 
   return router
