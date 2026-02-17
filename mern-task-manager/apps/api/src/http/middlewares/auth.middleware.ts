@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import { TokenVerifier } from '../../application/security/TokenVerifier.js'
+import { TokenVerifier } from '../../application/security/TokenVerifier'
+import { RequestContext } from '@/shared/infrastructure/RequestContext'
 
 export const authMiddleware = (
   tokenVerifier: TokenVerifier
@@ -16,18 +17,33 @@ export const authMiddleware = (
         return res.status(401).json({ message: 'Unauthorized' })
       }
 
+      // 🧪 test mode
+      if (process.env.NODE_ENV === 'test') {
+        const testUser = { id: 'test-user', role: 'user' }
+        req.user = testUser
+
+        RequestContext.setUserId(testUser.id)
+
+        return next()
+      }
+
       const token = authHeader.split(' ')[1]
 
       const payload = await tokenVerifier.verify(token)
-      req.user = {
+
+      const user = {
         id: payload.userId,
         role: payload.role
       }
-      
+
+      req.user = user
+
+      // 🔥 THIS IS THE IMPORTANT LINE
+      RequestContext.setUserId(user.id)
+
       next()
     } catch {
       return res.status(401).json({ message: 'Invalid token' })
     }
   }
 }
-

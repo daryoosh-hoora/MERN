@@ -1,15 +1,15 @@
-import mongoose, { Schema, Document } from 'mongoose'
+import mongoose, { HydratedDocument, Schema, Document } from 'mongoose'
 
-export interface UserDocument extends Document {
+export interface User {
   _id: string
   email: string
   passwordHash: string
   role: 'user' | 'admin'
-  isActive: Boolean
+  isActive: boolean
   createdAt: Date
 }
 
-const UserSchema = new Schema<UserDocument>(
+const UserSchema = new Schema<User>(
   {
     _id: {
       type: String,
@@ -41,8 +41,8 @@ const UserSchema = new Schema<UserDocument>(
   },
   {
     versionKey: false,
-    _id: false              // prevent auto ObjectId
   }
 )
 
-export const UserModel = mongoose.model<UserDocument>('User', UserSchema)
+export type UserDocument = HydratedDocument<User>
+export const UserModel = mongoose.model<User>('User', UserSchema)

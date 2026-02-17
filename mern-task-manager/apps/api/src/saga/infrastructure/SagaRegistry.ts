@@ -1,6 +1,6 @@
-import { BrokerEventBus } from '../../shared/infrastructure/event-bus/BrokerEventBus.js'
-import { Saga } from '../domain/Saga.js'
-import { idempotent } from '../../shared/infrastructure/event-bus/IdempotentConsumer.js'
+import { BrokerEventBus } from '../../shared/infrastructure/event-bus/BrokerEventBus'
+import { Saga } from '../domain/Saga'
+import { idempotent } from '../../shared/infrastructure/event-bus/IdempotentConsumer'
 
 export class SagaRegistry {
 

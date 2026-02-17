@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { TokenVerifier } from '../../application/security/TokenVerifier.js'
+import { TokenVerifier } from '../../application/security/TokenVerifier'
 
 export class JwtTokenVerifier implements TokenVerifier {
   constructor(private readonly secret: string) {}

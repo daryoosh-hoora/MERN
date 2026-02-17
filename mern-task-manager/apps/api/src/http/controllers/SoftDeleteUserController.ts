@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { SoftDeleteUserHandler } from '../../application/users/commands/SoftDeleteUserHandler.js'
+import { SoftDeleteUserHandler } from '../../application/users/commands/SoftDeleteUserHandler'
 
 export class SoftDeleteUserController {
   constructor(private readonly handler: SoftDeleteUserHandler) {}

@@ -1,6 +1,6 @@
-import { EventBus } from '../../application/EventBus.js'
-import { DomainEvent } from '../../domain/DomainEvent.js'
-import { EventSerializer } from './EventSerializer.js'
+import { EventBus } from '../../application/EventBus'
+import { DomainEvent } from '../../domain/DomainEvent'
+import { EventSerializer } from './EventSerializer'
 
 type Handler = (payload: any) => Promise<void>
 

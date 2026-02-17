@@ -1,8 +1,8 @@
-import { UserRepository } from '../../../domain/user/UserRepository.js'
-import { PasswordHasher } from '../../security/PasswordHasher.js'
-import { TokenService } from '../../security/TokenService.js'
-import { LoginCommand } from './LoginCommand.js'
-import { InvalidCredentialsError } from './LoginErrors.js'
+import { UserRepository } from '../../../domain/user/UserRepository'
+import { PasswordHasher } from '../../security/PasswordHasher'
+import { TokenService } from '../../security/TokenService'
+import { LoginCommand } from './LoginCommand'
+import { InvalidCredentialsError } from './LoginErrors'
 
 export class LoginHandler {
   constructor(

@@ -1,0 +1,77 @@
++---api
+¦   +---node_modules
+¦   +---src
+¦   ¦   +---application
+¦   ¦   ¦   +---auth
+¦   ¦   ¦   ¦   +---commands
+¦   ¦   ¦   +---security
+¦   ¦   ¦   +---tasks
+¦   ¦   ¦   ¦   +---commands
+¦   ¦   ¦   ¦   +---dto
+¦   ¦   ¦   ¦   +---handlers
+¦   ¦   ¦   ¦   +---queries
+¦   ¦   ¦   +---users
+¦   ¦   ¦       +---commands
+¦   ¦   ¦       +---dto
+¦   ¦   ¦       +---queries
+¦   ¦   +---config
+¦   ¦   +---domain
+¦   ¦   ¦   +---task
+¦   ¦   ¦   ¦   +---events
+¦   ¦   ¦   +---user
+¦   ¦   +---http
+¦   ¦   ¦   +---controllers
+¦   ¦   ¦   +---middlewares
+¦   ¦   ¦   +---routes
+¦   ¦   ¦   +---types
+¦   ¦   ¦   +---validators
+¦   ¦   +---infrastructure
+¦   ¦   ¦   +---cache
+¦   ¦   ¦   +---db
+¦   ¦   ¦   +---job-queue
+¦   ¦   ¦   +---models
+¦   ¦   ¦   +---repositories
+¦   ¦   ¦   +---security
+¦   ¦   +---modules
+¦   ¦   ¦   +---auth
+¦   ¦   ¦   ¦   +---audit
+¦   ¦   ¦   ¦   +---authentication
+¦   ¦   ¦   ¦   +---authorization
+¦   ¦   ¦   +---shared
+¦   ¦   ¦   +---task
+¦   ¦   ¦   ¦   +---api
+¦   ¦   ¦   ¦   +---application
+¦   ¦   ¦   ¦   +---domain
+¦   ¦   ¦   ¦   ¦   +---entities
+¦   ¦   ¦   ¦   ¦   +---enums
+¦   ¦   ¦   ¦   ¦   +---errors
+¦   ¦   ¦   ¦   ¦   +---events
+¦   ¦   ¦   ¦   ¦   +---repositories
+¦   ¦   ¦   ¦   ¦   +---value-objects
+¦   ¦   ¦   ¦   +---infrastructure
+¦   ¦   ¦   +---user
+¦   ¦   ¦       +---application
+¦   ¦   ¦       +---domain
+¦   ¦   ¦       +---infrastructure
+¦   ¦   +---saga
+¦   ¦   ¦   +---application
+¦   ¦   ¦   +---domain
+¦   ¦   ¦   +---infrastructure
+¦   ¦   +---shared
+¦   ¦       +---application
+¦   ¦       +---domain
+¦   ¦       +---errors
+¦   ¦       +---infrastructure
+¦   ¦           +---event-bus
+¦   ¦           +---mongo
+¦   ¦           +---Outbox
+¦   +---tests
+¦       +---e2e
+¦       +---integration
+¦       ¦   +---infrastructure
+¦       ¦   +---modules
+¦       +---unit
+¦       ¦   +---application
+¦       ¦   +---domain
+¦       +---utils
++---web

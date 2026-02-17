@@ -1,6 +1,6 @@
-import { createServer } from './http/index.js'
-import { initInfrastructure } from './infrastructure/index.js'
-import { env } from './config/env.js'
+import { createServer } from './http/index'
+import { initInfrastructure } from './infrastructure/index'
+import { env } from './config/env'
 
 async function bootstrap() {
   await initInfrastructure()

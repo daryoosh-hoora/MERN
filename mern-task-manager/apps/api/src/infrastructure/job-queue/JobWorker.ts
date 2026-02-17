@@ -1,4 +1,4 @@
-import { MongoJobModel } from './MongoJobModel.js'
+import { MongoJobModel } from './MongoJobModel'
 
 type JobHandler = (payload: any) => Promise<void>
 
@@ -14,6 +14,10 @@ export class JobWorker {
     setInterval(() => this.process(), intervalMs)
   }
 
+  async runOnce() {
+    await this.process()
+  }
+
   private async process() {
 
     const jobs = await MongoJobModel.find({
@@ -25,26 +29,42 @@ export class JobWorker {
       const handler = this.handlers.get(job.name)
       if (!handler) continue
 
-      job.status = 'processing'
-      await job.save()
+      // job.status = 'processing'
+      // await job.save()
+      await MongoJobModel.updateOne(
+        { _id: job._id },
+        { $set: { status: 'processing' } }
+      )
 
       try {
         await handler(job.payload)
 
-        job.status = 'completed'
-        await job.save()
-
+        // job.status = 'completed'
+        // await job.save()
+        await MongoJobModel.updateOne(
+          { _id: job._id },
+          { $set: { status: 'completed' } }
+        )
       } catch (err) {
 
         job.attempts += 1
 
-        if (job.attempts >= job.maxAttempts) {
-          job.status = 'failed'
-        } else {
-          job.status = 'pending'
-        }
+        // if (job.attempts >= job.maxAttempts) {
+        //   job.status = 'failed'
+        // } else {
+        //   job.status = 'pending'
+        // }
 
-        await job.save()
+        // await job.save()
+        await MongoJobModel.updateOne(
+          { _id: job._id },
+          {
+            $set: {
+              status: job.attempts >= job.maxAttempts ? 'failed' : 'pending',
+              // attempts
+            }
+          }
+        )
       }
     }
   }

@@ -1,5 +1,5 @@
-import { JobQueue } from './JobQueue.js'
-import { MongoJobModel } from './MongoJobModel.js'
+import { JobQueue } from './JobQueue'
+import { MongoJobModel } from './MongoJobModel'
 
 export class MongoJobQueue implements JobQueue {
 

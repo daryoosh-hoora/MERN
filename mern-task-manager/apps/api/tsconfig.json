@@ -1,8 +1,15 @@
 {
   "extends": "../../packages/config/tsconfig.base.json",
   "compilerOptions": {
+    "module": "ESNext",
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
+
+    "types": ["jest", "node"],
   },
-  "include": ["src", "../testes"]
+  "include": ["src", "tests", "jest.config.ts"]
 }

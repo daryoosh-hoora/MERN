@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { LoginHandler } from '../../application/auth/commands/LoginHandler.js'
+import { LoginHandler } from '../../application/auth/commands/LoginHandler'
 
 export class LoginController {
   constructor(private readonly handler: LoginHandler) { }

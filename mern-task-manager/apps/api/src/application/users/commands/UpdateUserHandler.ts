@@ -1,6 +1,6 @@
-import { UserRepository } from '../../../domain/user/UserRepository.js'
-import { UpdateUserCommand } from './UpdateUserCommand.js'
-import { UserResponse } from '../dto/UserResponse.js'
+import { UserRepository } from '../../../domain/user/UserRepository'
+import { UpdateUserCommand } from './UpdateUserCommand'
+import { UserResponse } from '../dto/UserResponse'
 
 export class UpdateUserHandler {
   constructor(private readonly userRepo: UserRepository) {}

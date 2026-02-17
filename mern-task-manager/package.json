@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "private": true,
-  "packageManager": "pnpm@10.27.0",
+  "packageManager": "pnpm@10.29.3",
   "dependencies": {
     "dotenv": "^17.2.3"
   }

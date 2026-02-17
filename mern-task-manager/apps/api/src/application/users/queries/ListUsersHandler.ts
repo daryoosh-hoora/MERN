@@ -1,6 +1,6 @@
-import { UserRepository } from '../../../domain/user/UserRepository.js'
-import { UserResponse } from '../dto/UserResponse.js'
-import { ListUsersQuery } from './ListUsersQuery.js'
+import { UserRepository } from '../../../domain/user/UserRepository'
+import { UserResponse } from '../dto/UserResponse'
+import { ListUsersQuery } from './ListUsersQuery'
 
 export class ListUsersHandler {
   constructor(private readonly userRepo: UserRepository) {}

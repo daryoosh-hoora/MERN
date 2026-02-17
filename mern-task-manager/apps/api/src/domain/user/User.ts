@@ -1,4 +1,4 @@
-import { InvalidEmailError, WeakPasswordError } from './UserErrors.js'
+import { InvalidEmailError, WeakPasswordError } from './UserErrors'
 
 export type UserProps = {
   id: string

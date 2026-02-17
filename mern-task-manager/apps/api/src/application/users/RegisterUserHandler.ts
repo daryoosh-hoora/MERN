@@ -1,8 +1,8 @@
-import { UserRepository } from '../../domain/user/UserRepository.js'
-import { User } from '../../domain/user/User.js'
-import { RegisterUserCommand } from './RegisterUserCommand.js'
-import { UserAlreadyExistsError } from './RegisterUserErrors.js'
-import { PasswordHasher } from '../security/PasswordHasher.js'
+import { UserRepository } from '../../domain/user/UserRepository'
+import { User } from '../../domain/user/User'
+import { RegisterUserCommand } from './RegisterUserCommand'
+import { UserAlreadyExistsError } from './RegisterUserErrors'
+import { PasswordHasher } from '../security/PasswordHasher'
 
 export class RegisterUserHandler {
   constructor(

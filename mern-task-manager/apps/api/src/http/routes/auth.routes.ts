@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { LoginController } from '../controllers/LoginController.js'
-import { RegisterUserController } from '../controllers/RegisterUserController.js'
+import { LoginController } from '../controllers/LoginController'
+import { RegisterUserController } from '../controllers/RegisterUserController'
 
 export function createAuthRouter(
   registerUserController: RegisterUserController,

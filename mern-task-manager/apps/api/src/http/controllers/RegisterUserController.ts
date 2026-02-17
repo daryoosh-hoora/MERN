@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { RegisterUserHandler } from '../../application/users/RegisterUserHandler.js'
-import { UserAlreadyExistsError } from '../../application/users/RegisterUserErrors.js'
-import { InvalidEmailError, WeakPasswordError } from '../../domain/user/UserErrors.js'
+import { RegisterUserHandler } from '../../application/users/RegisterUserHandler'
+import { UserAlreadyExistsError } from '../../application/users/RegisterUserErrors'
+import { InvalidEmailError, WeakPasswordError } from '../../domain/user/UserErrors'
 
 export class RegisterUserController {
   constructor(private readonly handler: RegisterUserHandler) {}

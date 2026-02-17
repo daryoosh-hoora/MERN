@@ -1,5 +1,5 @@
-import { UserRepository } from '../../../domain/user/UserRepository.js'
-import { UserResponse } from '../dto/UserResponse.js'
+import { UserRepository } from '../../../domain/user/UserRepository'
+import { UserResponse } from '../dto/UserResponse'
 
 export class GetUserByIdHandler {
   constructor(private readonly userRepo: UserRepository) {}

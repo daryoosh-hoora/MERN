@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ListUsersHandler } from '../../application/users/queries/ListUsersHandler.js'
+import { ListUsersHandler } from '../../application/users/queries/ListUsersHandler'
 
 export class ListUsersController {
   constructor(private readonly handler: ListUsersHandler) {}

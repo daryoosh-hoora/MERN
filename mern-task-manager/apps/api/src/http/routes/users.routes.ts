@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { GetUserByIdController } from '../controllers/GetUserByIdController.js'
-import { ListUsersController } from '../controllers/ListUsersController.js'
-import { UpdateUserController } from '../controllers/UpdateUserController.js'
-import { SoftDeleteUserController } from '../controllers/SoftDeleteUserController.js'
-import { authorize } from '../middlewares/authorize.middleware.js'
-import { authorizeSelfOrAdmin } from '../middlewares/authorizeSelfOrAdmin.middleware.js'
+import { GetUserByIdController } from '../controllers/GetUserByIdController'
+import { ListUsersController } from '../controllers/ListUsersController'
+import { UpdateUserController } from '../controllers/UpdateUserController'
+import { SoftDeleteUserController } from '../controllers/SoftDeleteUserController'
+import { authorize } from '../middlewares/authorize.middleware'
+import { authorizeSelfOrAdmin } from '../middlewares/authorizeSelfOrAdmin.middleware'
 
 export function createUsersRouter(
   getUserByIdController: GetUserByIdController,

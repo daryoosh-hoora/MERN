@@ -1,5 +1,5 @@
-import { UserRepository } from '../../../domain/user/UserRepository.js'
-import { SoftDeleteUserCommand } from './SoftDeleteUserCommand.js'
+import { UserRepository } from '../../../domain/user/UserRepository'
+import { SoftDeleteUserCommand } from './SoftDeleteUserCommand'
 
 export class SoftDeleteUserHandler {
   constructor(private readonly userRepo: UserRepository) {}

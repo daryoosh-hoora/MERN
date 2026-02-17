@@ -1,4 +1,4 @@
-import { DomainEvent } from '../../shared/domain/DomainEvent.js'
+import { DomainEvent } from '../../shared/domain/DomainEvent'
 
 export abstract class Saga {
 

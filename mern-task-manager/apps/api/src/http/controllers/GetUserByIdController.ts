@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { GetUserByIdHandler } from '../../application/users/queries/GetUserByIdHandler.js'
+import { GetUserByIdHandler } from '../../application/users/queries/GetUserByIdHandler'
 
 export class GetUserByIdController {
   constructor(private readonly handler: GetUserByIdHandler) {}

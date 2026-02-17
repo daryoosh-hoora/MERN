@@ -1,4 +1,4 @@
-import { ProcessedEventModel } from '../mongo/ProcessedEventModel.js'
+import { ProcessedEventModel } from '../mongo/ProcessedEventModel'
 
 export const idempotent =
   (handler: (payload: any) => Promise<void>) =>

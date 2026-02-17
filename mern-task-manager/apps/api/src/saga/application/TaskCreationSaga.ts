@@ -1,9 +1,11 @@
-import { Saga } from '../domain/Saga.js'
-import { DomainEvent } from '../../shared/domain/DomainEvent.js'
-import { JobQueue } from '../../infrastructure/job-queue/JobQueue.js'
+import { Saga } from '../domain/Saga'
+import { DomainEvent } from '../../shared/domain/DomainEvent'
+import { JobQueue } from '../../infrastructure/job-queue/JobQueue'
 
 export class TaskCreationSaga extends Saga {
-  constructor(private readonly jobQueue: JobQueue) { }
+  constructor(private readonly jobQueue: JobQueue) {
+    super()   // ✅ REQUIRED
+   }
   
   subscribedTo(): string[] {
     return ['task.created']

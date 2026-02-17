@@ -1,7 +1,7 @@
-import { connectMongo } from './db/mongo.js'
-import { createRedisClient } from './cache/redis.js'
-import { MongoUserRepository } from './repositories/MongoUserRepository.js'
-import { env } from '../config/env.js'
+import { connectMongo, disconnectMongo } from './db/mongo'
+import { createRedisClient } from './cache/redis'
+import { MongoUserRepository } from './repositories/MongoUserRepository'
+import { env } from '../config/env'
 
 export async function initInfrastructure() {
   await connectMongo(env.mongoUri)
@@ -13,4 +13,12 @@ export async function initInfrastructure() {
     redis,
     userRepository
   }
+}
+
+export async function shutdownInfrastructure() {
+  await disconnectMongo()
+
+  // if (redis.status === 'ready') {
+  //   await redis.quit()
+  // }
 }

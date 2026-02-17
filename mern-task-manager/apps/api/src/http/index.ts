@@ -2,42 +2,45 @@ import 'express-async-errors'
 
 import express from 'express'
 
-import { authMiddleware } from './middlewares/auth.middleware.js'
-import { errorMiddleware } from './middlewares/error.middleware.js'
-import { BrokerEventBus } from '../shared/infrastructure/event-bus/BrokerEventBus.js'";
-import { OutboxProcessor } from '../shared/infrastructure/Outbox/OutboxProcessor.js'
-import { TaskCreationSaga } from '../saga/application/TaskCreationSaga.js'
-import { SagaRegistry } from '../saga/infrastructure/SagaRegistry.js'
+import { authMiddleware } from './middlewares/auth.middleware'
+import { errorMiddleware } from './middlewares/error.middleware'
+import { BrokerEventBus } from '../shared/infrastructure/event-bus/BrokerEventBus'
+import { OutboxProcessor } from '../shared/infrastructure/Outbox/OutboxProcessor'
+import { TaskCreationSaga } from '../saga/application/TaskCreationSaga'
+import { SagaRegistry } from '../saga/infrastructure/SagaRegistry'
 
-import { healthRouter } from './routes/health.routes.js'
-import { createAuthRouter } from './routes/auth.routes.js'
-import { createUsersRouter } from './routes/users.routes.js'
-import { RegisterUserController } from './controllers/RegisterUserController.js'
-import { RegisterUserHandler } from '../application/users/RegisterUserHandler.js'
-import { MongoUserRepository } from '../infrastructure/repositories/MongoUserRepository.js'
-import { BcryptPasswordHasher } from '../infrastructure/security/BcryptPasswordHasher.js'
-import { GetUserByIdHandler } from '../application/users/queries/GetUserByIdHandler.js'
-import { GetUserByIdController } from './controllers/GetUserByIdController.js'
-import { ListUsersHandler } from '../application/users/queries/ListUsersHandler.js'
-import { ListUsersController } from './controllers/ListUsersController.js'
-import { UpdateUserHandler } from '../application/users/commands/UpdateUserHandler.js'
-import { UpdateUserController } from './controllers/UpdateUserController.js'
-import { SoftDeleteUserHandler } from '../application/users/commands/SoftDeleteUserHandler.js'
-import { SoftDeleteUserController } from './controllers/SoftDeleteUserController.js'
-import { JwtTokenService } from '../infrastructure/security/JwtTokenService.js'
-import { LoginHandler } from '../application/auth/commands/LoginHandler.js'
-import { LoginController } from './controllers/LoginController.js'
-import { JwtTokenVerifier } from '../infrastructure/security/JwtTokenVerifier.js'
-import { MongoTaskRepository } from '../infrastructure/repositories/MongoTaskRepository.js'
-import { CreateTaskHandler } from '../application/tasks/commands/CreateTaskHandler.js'
-import { TaskController } from './controllers/TaskController.js'
-import { tasksRouter } from './routes/tasks.routes.js'
-import { ListMyTasksHandler } from '../application/tasks/queries/ListMyTasksHandler.js'
-import { GetTaskByIdHandler } from '../application/tasks/queries/GetTaskByIdHandler.js'
-import { UpdateTaskHandler } from '../application/tasks/commands/UpdateTaskHandler.js'
-import { SoftDeleteTaskHandler } from '../application/tasks/commands/SoftDeleteTaskHandler.js'
-import { MongoJobQueue } from '../infrastructure/job-queue/MongoJobQueue.js'
-import { JobWorker } from '../infrastructure/job-queue/JobWorker.js'
+import { healthRouter } from './routes/health.routes'
+import { createAuthRouter } from './routes/auth.routes'
+import { createUsersRouter } from './routes/users.routes'
+import { taskRouters } from '@/modules/task/api/task.routes'
+
+import { RegisterUserController } from './controllers/RegisterUserController'
+import { RegisterUserHandler } from '../application/users/RegisterUserHandler'
+import { MongoUserRepository } from '../infrastructure/repositories/MongoUserRepository'
+import { BcryptPasswordHasher } from '../infrastructure/security/BcryptPasswordHasher'
+import { GetUserByIdHandler } from '../application/users/queries/GetUserByIdHandler'
+import { GetUserByIdController } from './controllers/GetUserByIdController'
+import { ListUsersHandler } from '../application/users/queries/ListUsersHandler'
+import { ListUsersController } from './controllers/ListUsersController'
+import { UpdateUserHandler } from '../application/users/commands/UpdateUserHandler'
+import { UpdateUserController } from './controllers/UpdateUserController'
+import { SoftDeleteUserHandler } from '../application/users/commands/SoftDeleteUserHandler'
+import { SoftDeleteUserController } from './controllers/SoftDeleteUserController'
+import { JwtTokenService } from '../infrastructure/security/JwtTokenService'
+import { LoginHandler } from '../application/auth/commands/LoginHandler'
+import { LoginController } from './controllers/LoginController'
+import { JwtTokenVerifier } from '../infrastructure/security/JwtTokenVerifier'
+import { MongoTaskRepository } from '../modules/task/infrastructure/repositories/MongoTaskRepository'
+import { TaskController } from '@/modules/task/api/TaskController'
+import { CreateTaskCommandHandler } from '../modules/task/application/commands/CreateTaskCommand'
+import { UpdateTaskCommandHandler } from '../modules/task/application/commands/UpdateTaskCommand'
+import { SoftDeleteTaskCommandHandler } from '../modules/task/application/commands/SoftDeleteTaskCommand'
+import { ListMyTasksQueryHandler } from '../modules/task/application/queries/ListMyTasksQuery'
+import { GetTaskByIdQueryHandler } from '../modules/task/application/queries/GetTaskByIdQuery'
+import { MongoJobQueue } from '../infrastructure/job-queue/MongoJobQueue'
+import { JobWorker } from '../infrastructure/job-queue/JobWorker'
+import { RequestContext } from '@/shared/infrastructure/RequestContext'
+import { RequestCurrentUserProvider } from '@/shared/infrastructure/RequestCurrentUserProvider'
 
 export function createServer() {
   const app = express()
@@ -51,10 +54,16 @@ export function createServer() {
 
   // dependencies
   const userRepository = new MongoUserRepository()
-  const taskRepository = new MongoTaskRepository(null)
+  const taskRepository = new MongoTaskRepository()
   const passwordHasher = new BcryptPasswordHasher()
   const tokenService = new JwtTokenService(jwtSecret)
   const tokenVerifier = new JwtTokenVerifier(jwtSecret)
+
+  app.use((req, res, next) => {
+    RequestContext.run(() => next())
+  })
+
+  const currentUser = new RequestCurrentUserProvider()
 
   const auth = authMiddleware(tokenVerifier)
 
@@ -107,14 +116,15 @@ export function createServer() {
     passwordHasher,
     tokenService
   )
-  const createTaskHandler = new CreateTaskHandler(
+  const createTaskCommandHandler = new CreateTaskCommandHandler(
     taskRepository,
+    currentUser,
     eventBus
   )
-  const listMyTasksHandler = new ListMyTasksHandler(taskRepository)
-  const getTaskByIdHandler = new GetTaskByIdHandler(taskRepository)
-  const updateTaskHandler = new UpdateTaskHandler(taskRepository)
-  const softDeleteTaskHandler = new SoftDeleteTaskHandler(taskRepository)
+  const listMyTasksQueryHandler = new ListMyTasksQueryHandler(taskRepository)
+  const getTaskByIdQueryHandler = new GetTaskByIdQueryHandler(taskRepository)
+  const updateTaskCommandHandler = new UpdateTaskCommandHandler(taskRepository)
+  const softDeleteTaskCommandHandler = new SoftDeleteTaskCommandHandler(taskRepository)
 
   // controllers
   const registerUserController = new RegisterUserController(
@@ -128,13 +138,14 @@ export function createServer() {
   const softDeleteUserController = new SoftDeleteUserController(
     softDeleteUserHandler
   )
+
   const loginController = new LoginController(loginHandler)
   const taskController = new TaskController(
-    createTaskHandler,
-    listMyTasksHandler,
-    getTaskByIdHandler,
-    updateTaskHandler,
-    softDeleteTaskHandler
+    createTaskCommandHandler,
+    updateTaskCommandHandler,
+    softDeleteTaskCommandHandler,
+    listMyTasksQueryHandler,
+    getTaskByIdQueryHandler
   )
 
   // routes
@@ -150,7 +161,7 @@ export function createServer() {
   )
 
   app.use('/tasks',
-    tasksRouter(
+    taskRouters(
       taskController,
       tokenVerifier
     )

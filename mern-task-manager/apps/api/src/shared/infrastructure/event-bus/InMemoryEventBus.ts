@@ -1,10 +1,10 @@
-import { EventBus } from '../../application/EventBus.js'
-import { DomainEvent } from '../../domain/DomainEvent.js'
+import { EventBus } from '../../application/EventBus'
+import { DomainEvent } from '../../domain/DomainEvent'
 
 type EventHandler = (event: DomainEvent) => Promise<void>
 
 export class InMemoryEventBus implements EventBus {
-
+  private publishedEvents: DomainEvent[] = []
   private handlers: Map<string, EventHandler[]> = new Map()
 
   register(eventName: string, handler: EventHandler) {
@@ -20,6 +20,24 @@ export class InMemoryEventBus implements EventBus {
       for (const handler of handlers) {
         await handler(event)
       }
+
+      this.publishedEvents.push(event)
     }
   }
+
+
+
+  // async publish(event: DomainEvent): Promise<void> {
+  //   this.events.push(event)
+  // }
+
+  getPublishedEvents() {
+    return this.publishedEvents
+  }
+
+  // getPublishedEvents(): DomainEvent[] {
+  //   const allHandlers = Array.from(this.handlers.values()).flat()
+  //   const publishedEvents: DomainEvent[] = []
+  //   return publishedEvents
+  // }
 }

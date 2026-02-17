@@ -1,4 +1,4 @@
-import { DomainEvent } from '../../domain/DomainEvent.js'
+import { DomainEvent } from '../../domain/DomainEvent'
 
 export interface SerializedEvent {
   eventId: string
