@@ -1,18 +1,11 @@
-import { DomainEvent } from '@/shared/domain/DomainEvent'
+import { IDomainEvent } from '@/shared/domain/IDomainEvent'
+import { UniqueEntityId } from '@/shared/domain/UniqueEntityId'
 
-export class TaskDeletedEvent extends DomainEvent {
-
-  readonly eventName = 'task.deleted'
-
-  constructor(
-    public readonly taskId: string
-  ) {
-    super()
+export class TaskDeletedEvent implements IDomainEvent {
+  constructor(public readonly taskId: UniqueEntityId) {
   }
 
-  toPrimitives() {
-    return {
-      taskId: this.taskId
-    }
+  getAggregateId(): UniqueEntityId {
+    return this.taskId
   }
 }

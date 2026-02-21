@@ -1,5 +1,5 @@
 import { Saga } from '../domain/Saga'
-import { DomainEvent } from '../../shared/domain/DomainEvent'
+import { DomainEvent } from '../../shared/domain/IDomainEvent'
 import { JobQueue } from '../../infrastructure/job-queue/JobQueue'
 
 export class TaskCreationSaga extends Saga {

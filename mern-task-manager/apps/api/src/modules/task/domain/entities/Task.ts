@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto'
 import { AggregateRoot } from "@/shared/domain/AggregateRoot"
 import { TaskCreatedEvent } from "../events/TaskCreatedEvent"
 import { TaskStartedEvent } from '../events/TaskStartedEvent'
@@ -7,12 +6,14 @@ import { TaskDeletedEvent } from '../events/TaskDeletedEvent'
 import { TaskTitle } from "../value-objects/TaskTitle"
 import { TaskStatus } from "../value-objects/TaskStatus"
 import { TaskDescription } from "../value-objects/TaskDescription"
+import { Result } from '@/shared/domain/Result'
+import { UniqueEntityId } from '@/shared/domain/UniqueEntityId'
 import {
   TaskAlreadyStartedError,
   TaskAlreadyCompletedError
 } from '../errors/TaskErrors'
 
-type TaskProps = {
+export type TaskProps = {
   title: TaskTitle
   description?: TaskDescription | null
   status: TaskStatus
@@ -23,16 +24,14 @@ type TaskProps = {
   deletedAt?: Date | null
 }
 
-export class Task extends AggregateRoot {
-  private constructor(
-    private readonly _id: string,
-    private props: TaskProps
-  ) {
-    super()
+export class Task extends AggregateRoot<TaskProps> {
+
+  private constructor(props: TaskProps, id?: UniqueEntityId) {
+    super(props, id)
   }
 
-  public static create(ownerId: string, title: string, description?: string): Task {
-    const task = new Task(randomUUID(), {
+  public static create(ownerId: string, title: string, description?: string): Result<Task> {
+    const task = new Task({
       title: TaskTitle.create(title),
       description: description ? TaskDescription.create(description) : null,
       status: TaskStatus.pending(),
@@ -47,7 +46,7 @@ export class Task extends AggregateRoot {
       new TaskCreatedEvent(task._id)
     )
 
-    return task
+    return Result.ok(task)
   }
 
   public delete() {
@@ -59,7 +58,7 @@ export class Task extends AggregateRoot {
   }
 
   public static rehydrate(id: string, props: TaskProps): Task {
-    return new Task(id, props)
+    return new Task(props, new UniqueEntityId(id))
   }
 
   public start(): void {
@@ -87,7 +86,7 @@ export class Task extends AggregateRoot {
   }
 
   // getters
-  public get id(): string {
+  public get id(): UniqueEntityId {
     return this._id
   }
   public get title(): TaskTitle {
@@ -113,6 +112,10 @@ export class Task extends AggregateRoot {
   }
   public get deletedAt(): Date | null {
     return this.props.deletedAt || null
+  }
+
+  isOwnedBy(userId: string): boolean {
+    return this.ownerId === userId
   }
 
   //behavior

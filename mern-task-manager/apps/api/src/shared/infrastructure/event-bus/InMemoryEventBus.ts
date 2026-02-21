@@ -1,9 +1,9 @@
-import { EventBus } from '../../application/EventBus'
+import { IEventBus } from '../../application/IEventBus'
 import { DomainEvent } from '../../domain/DomainEvent'
 
 type EventHandler = (event: DomainEvent) => Promise<void>
 
-export class InMemoryEventBus implements EventBus {
+export class InMemoryEventBus implements IEventBus {
   private publishedEvents: DomainEvent[] = []
   private handlers: Map<string, EventHandler[]> = new Map()
 

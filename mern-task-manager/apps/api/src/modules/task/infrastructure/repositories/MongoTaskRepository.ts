@@ -1,12 +1,12 @@
 import { Task } from "../../domain/entities/Task"
-import { ITaskRepository } from '../../domain/repositories/TaskRepository'
+import { ITaskRepository } from '../../domain/repositories/ITaskRepository'
 import { TaskDescription } from "../../domain/value-objects/TaskDescription"
 import { TaskStatus } from "../../domain/value-objects/TaskStatus"
 import { TaskTitle } from "../../domain/value-objects/TaskTitle"
 import { TaskModel } from '../models/TaskModel'
 import { OutboxModel } from '@/shared/infrastructure/mongo/OutboxModel'
 
-type TaskModel<Task> = Task & Document
+//type TaskModel<Task> = Task & Document
 
 export class MongoTaskRepository implements ITaskRepository {
 
@@ -117,7 +117,7 @@ export class MongoTaskRepository implements ITaskRepository {
         ownerId: task.ownerId,
         createdAt: task.createdAt,
         updatedAt: task.updatedAt,
-        deletedAt: task.deletedAt
+        deletedAt: task.deletedAt!
       })
 
     //   return

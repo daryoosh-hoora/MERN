@@ -1,10 +1,10 @@
-import { EventBus } from '../../application/EventBus'
+import { IEventBus } from '../../application/IEventBus'
 import { DomainEvent } from '../../domain/DomainEvent'
 import { EventSerializer } from './EventSerializer'
 
 type Handler = (payload: any) => Promise<void>
 
-export class BrokerEventBus implements EventBus {
+export class BrokerEventBus implements IEventBus {
 
   private topics: Map<string, Handler[]> = new Map()
 

@@ -1,5 +1,5 @@
 import { OutboxModel } from '../mongo/OutboxModel'
-import { EventBus } from '../../application/EventBus'
+import { EventBus } from '../../application/IEventBus'
 
 export class OutboxProcessor {
 

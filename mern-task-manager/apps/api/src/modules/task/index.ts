@@ -1,4 +1,12 @@
-export { taskRouters } from './api/task.routes'
+import { DomainEventDispatcher } from '@/shared/domain/DomainEventDispatcher'
+import { TaskCreatedEvent } from './domain/events/TaskCreatedEvent'
+import { TaskCreatedHandler } from './application/handlers/TaskCreatedEventHandler'
 
-//If another module needs to call Task use cases:
-//export * from './application/commands/CreateTaskCommand'
+export function registerTaskModuleEvents() {
+  DomainEventDispatcher.register(
+    TaskCreatedEvent,
+    new TaskCreatedHandler()
+  )
+}
+
+export { taskRouters } from './api/task.routes'

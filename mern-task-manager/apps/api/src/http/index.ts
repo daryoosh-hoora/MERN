@@ -34,13 +34,14 @@ import { MongoTaskRepository } from '../modules/task/infrastructure/repositories
 import { TaskController } from '@/modules/task/api/TaskController'
 import { CreateTaskCommandHandler } from '../modules/task/application/commands/CreateTaskCommand'
 import { UpdateTaskCommandHandler } from '../modules/task/application/commands/UpdateTaskCommand'
-import { SoftDeleteTaskCommandHandler } from '../modules/task/application/commands/SoftDeleteTaskCommand'
+import { DeleteTaskCommandHandler } from '../modules/task/application/commands/DeleteTaskCommand'
 import { ListMyTasksQueryHandler } from '../modules/task/application/queries/ListMyTasksQuery'
 import { GetTaskByIdQueryHandler } from '../modules/task/application/queries/GetTaskByIdQuery'
 import { MongoJobQueue } from '../infrastructure/job-queue/MongoJobQueue'
 import { JobWorker } from '../infrastructure/job-queue/JobWorker'
 import { RequestContext } from '@/shared/infrastructure/RequestContext'
 import { RequestCurrentUserProvider } from '@/shared/infrastructure/RequestCurrentUserProvider'
+import { registerTaskModuleEvents } from '@/modules/task'
 
 export function createServer() {
   const app = express()
@@ -66,6 +67,8 @@ export function createServer() {
   const currentUser = new RequestCurrentUserProvider()
 
   const auth = authMiddleware(tokenVerifier)
+
+  registerTaskModuleEvents()
 
   const eventBus = new BrokerEventBus()
 
@@ -119,12 +122,16 @@ export function createServer() {
   const createTaskCommandHandler = new CreateTaskCommandHandler(
     taskRepository,
     currentUser,
-    eventBus
+    // eventBus
   )
   const listMyTasksQueryHandler = new ListMyTasksQueryHandler(taskRepository)
   const getTaskByIdQueryHandler = new GetTaskByIdQueryHandler(taskRepository)
-  const updateTaskCommandHandler = new UpdateTaskCommandHandler(taskRepository)
-  const softDeleteTaskCommandHandler = new SoftDeleteTaskCommandHandler(taskRepository)
+  const updateTaskCommandHandler = new UpdateTaskCommandHandler(
+    taskRepository,
+    currentUser,
+    // eventBus
+  )
+  const deleteTaskCommandHandler = new DeleteTaskCommandHandler(taskRepository)
 
   // controllers
   const registerUserController = new RegisterUserController(
@@ -143,7 +150,7 @@ export function createServer() {
   const taskController = new TaskController(
     createTaskCommandHandler,
     updateTaskCommandHandler,
-    softDeleteTaskCommandHandler,
+    DeleteTaskCommandHandler,
     listMyTasksQueryHandler,
     getTaskByIdQueryHandler
   )

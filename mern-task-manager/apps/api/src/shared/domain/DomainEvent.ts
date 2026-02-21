@@ -1,16 +1,16 @@
-import { randomUUID } from 'crypto'
+import { UniqueEntityId } from './UniqueEntityId'
 
 export abstract class DomainEvent {
 
-  public readonly eventId: string
+  public readonly eventId: UniqueEntityId
   public readonly occurredOn: Date
-  public readonly aggregateId: string
+  public readonly aggregateId: UniqueEntityId
   public abstract readonly eventName: string
 
-  constructor(aggregateId?: string) {
-    this.eventId = randomUUID()
+  constructor(aggregateId?: UniqueEntityId) {
+    this.eventId = new UniqueEntityId()
     this.occurredOn = new Date()
-    this.aggregateId = aggregateId ?? ''
+    this.aggregateId = aggregateId!
   }
 
   abstract toPrimitives(): any

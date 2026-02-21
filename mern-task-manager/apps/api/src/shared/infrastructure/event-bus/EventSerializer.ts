@@ -1,7 +1,7 @@
+import { UniqueEntityId } from '@/shared/domain/UniqueEntityId'
 import { DomainEvent } from '../../domain/DomainEvent'
-
 export interface SerializedEvent {
-  eventId: string
+  eventId: UniqueEntityId
   eventName: string
   occurredOn: Date
   payload: any

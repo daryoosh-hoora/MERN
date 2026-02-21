@@ -1,5 +1,5 @@
 import { Task } from '../../domain/entities/Task'
-import { ITaskRepository } from '../../domain/repositories/TaskRepository'
+import { ITaskRepository } from '../../domain/repositories/ITaskRepository'
 import { NotFoundError } from '@/shared/errors/NotFoundError'
 import { ForbiddenError } from '@/shared/errors/ForbiddenError'
 

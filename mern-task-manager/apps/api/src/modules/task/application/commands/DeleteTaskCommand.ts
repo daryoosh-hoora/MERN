@@ -1,8 +1,8 @@
-import { ITaskRepository } from '../../domain/repositories/TaskRepository'
+import { ITaskRepository } from '../../domain/repositories/ITaskRepository'
 import { NotFoundError } from '@/shared/errors/NotFoundError'
 import { ForbiddenError } from '@/shared/errors/ForbiddenError'
 
-export class SoftDeleteTaskCommand {
+export class DeleteTaskCommand {
   constructor(
     public readonly taskId: string,
     public readonly requesterId: string,
@@ -10,12 +10,12 @@ export class SoftDeleteTaskCommand {
   ) {}
 }
 
-export class SoftDeleteTaskCommandHandler {
+export class DeleteTaskCommandHandler {
   constructor(
     private readonly taskRepository: ITaskRepository
   ) {}
 
-  async execute(command: SoftDeleteTaskCommand): Promise<void> {
+  async execute(command: DeleteTaskCommand): Promise<void> {
     const task = await this.taskRepository.findById(command.taskId)
 
     if (!task) {

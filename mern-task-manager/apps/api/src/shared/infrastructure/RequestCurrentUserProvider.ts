@@ -1,4 +1,4 @@
-import { ICurrentUserProvider } from '../application/CurrentUserProvider'
+import { ICurrentUserProvider } from '../application/ICurrentUserProvider'
 import { RequestContext } from './RequestContext'
 
 export class RequestCurrentUserProvider

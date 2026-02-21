@@ -1,15 +1,19 @@
-import { DomainEvent } from "./DomainEvent"
+import { Entity } from './Entity'
+import { IDomainEvent } from './IDomainEvent'
 
-export abstract class AggregateRoot {
-  private domainEvents: DomainEvent[] = []
+export abstract class AggregateRoot<T> extends Entity<T> {
 
-  protected addDomainEvent(event: DomainEvent): void {
-    this.domainEvents.push(event)
+  private _domainEvents: IDomainEvent[] = []
+
+  get domainEvents(): IDomainEvent[] {
+    return this._domainEvents
   }
 
-  public pullDomainEvents(): DomainEvent[] {
-    const events = this.domainEvents
-    this.domainEvents = []
-    return events
+  protected addDomainEvent(event: IDomainEvent): void {
+    this._domainEvents.push(event)
+  }
+
+  public clearDomainEvents(): void {
+    this._domainEvents = []
   }
 }
