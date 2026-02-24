@@ -3,24 +3,24 @@ import { NotFoundError } from '@/shared/errors/NotFoundError'
 import { ForbiddenError } from '@/shared/errors/ForbiddenError'
 import { ICurrentUserProvider } from '@/shared/application/ICurrentUserProvider'
 import { Result } from '@/shared/domain/Result'
+import { IUpdateTaskRequestDTO } from '../dto/IUpdateTaskRequestDTO'
 import { IUpdateTaskResponseDTO } from '../dto/IUpdateTaskResponseDTO'
 import { ErrorCodes } from '@/shared/application/ErrorCodes'
 import { IEventBus } from '@/shared/application/IEventBus'
 import { DomainEventDispatcher } from '@/shared/domain/DomainEventDispatcher'
+import { ICommandHandler } from '@/shared/application/command-bus/ICommandHandler'
+import { ICommand } from '@/shared/application/command-bus/ICommand'
 
-export class UpdateTaskCommand {
+export class UpdateTaskCommand
+  implements ICommand<Result<IUpdateTaskResponseDTO>> {
+
   constructor(
-    public readonly taskId: string,
-    public readonly requesterRole: string,
-    public readonly data: {
-      title?: string
-      description?: string
-      status?: TaskStatusEnum
-    }
+    public readonly data: IUpdateTaskRequestDTO
   ) { }
 }
+export class UpdateTaskCommandHandler 
+implements ICommandHandler<UpdateTaskCommand, Result<IUpdateTaskResponseDTO>> {
 
-export class UpdateTaskCommandHandler {
   constructor(
     private readonly taskRepository: ITaskRepository,
     private readonly currentUser: ICurrentUserProvider
@@ -37,7 +37,7 @@ export class UpdateTaskCommandHandler {
       })
     }
 
-    const task = await this.taskRepository.findById(command.taskId)
+    const task = await this.taskRepository.findById(command.data.taskId)
 
     if (!task) {
       return Result.fail({
@@ -46,9 +46,7 @@ export class UpdateTaskCommandHandler {
       })
     }
 
-    const isAdmin = command.requesterRole === 'admin'
-
-    if (!task.isOwnedBy(userId) && !isAdmin) {
+    if (!task.isOwnedBy(userId)) {
       return Result.fail({
         code: ErrorCodes.FORBIDDEN,
         message: 'Forbidden to update task'
@@ -70,9 +68,11 @@ export class UpdateTaskCommandHandler {
 
     await this.taskRepository.update(task)
 
-    await DomainEventDispatcher.dispatchAll(task.domainEvents)
+    await unitOfWork.registerAggregate(task)
 
-    task.clearDomainEvents()
+    // await DomainEventDispatcher.dispatchAll(task.domainEvents)
+
+    // task.clearDomainEvents()
 
     // await this.eventBus.publish(task.pullDomainEvents())
 

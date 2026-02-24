@@ -1,31 +1,22 @@
 import { Request, Response } from 'express'
 
-import { CreateTaskCommand, CreateTaskCommandHandler } from '../application/commands/CreateTaskCommand'
-import { UpdateTaskCommand, UpdateTaskCommandHandler } from '../application/commands/UpdateTaskCommand'
-import { DeleteTaskCommand, DeleteTaskCommandHandler } from '../application/commands/DeleteTaskCommand'
-
-import { ListMyTasksQuery, ListMyTasksQueryHandler } from '../application/queries/ListMyTasksQuery'
-import { GetTaskByIdQuery, GetTaskByIdQueryHandler } from '../application/queries/GetTaskByIdQuery'
+import { GetAllTasksQuery } from '../application/queries/GetAllTasksQuery'
+import { GetTaskByIdQuery } from '../application/queries/GetTaskByIdQuery'
 import { ErrorCodes } from '@/shared/application/ErrorCodes'
+import { ITaskApplicationService } from '../application/ports/inbound/ITaskApplicationService'
 
 export class TaskController {
   constructor(
-    private readonly createTaskCommandHandler: CreateTaskCommandHandler,
-    private readonly updateTaskCommandHandler: UpdateTaskCommandHandler,
-    private readonly deleteTaskCommandHandler: DeleteTaskCommandHandler,
-    private readonly listMyTasksQueryHandler: ListMyTasksQueryHandler,
-    private readonly getTaskByIdQueryHandler: GetTaskByIdQueryHandler,
+    private readonly taskApplicationService: ITaskApplicationService
   ) { }
 
   create = async (req: Request, res: Response) => {
     const userId = req.user!.id
 
-    const command = new CreateTaskCommand({
+    const result = await this.taskApplicationService.createTask({
       title: req.body.title,
       description: req.body.description!
     })
-
-    const result = await this.createTaskCommandHandler.execute(command)
 
     if (result.isFailure) {
       switch (result.error?.code) {
@@ -46,7 +37,7 @@ export class TaskController {
 
   }
 
-  listMyTasks = async (req: Request, res: Response) => {
+  list = async (req: Request, res: Response) => {
     const ownerId = req.user!.id
 
     const limit = Math.min(Number(req.query.limit) || 10, 100)
@@ -67,8 +58,7 @@ export class TaskController {
       }
     }
 
-    const query = new ListMyTasksQuery(
-      ownerId,
+    const query = new GetAllTasksQuery(
       limit,
       offset,
       status,
@@ -76,48 +66,36 @@ export class TaskController {
       sortDirection
     )
 
-    const tasks = await this.listMyTasksQueryHandler.execute(query)
+    const tasks = await this.taskApplicationService.getAllTasks(query)
 
     res.json(tasks)
   }
 
   getById = async (req: Request, res: Response) => {
     const query = new GetTaskByIdQuery(
-      req.params.id,
-      req.user!.id,
-      req.user!.role
+      req.params.id
     )
 
-    const task = await this.getTaskByIdQueryHandler.execute(query)
+    const task = await this.taskApplicationService.getTaskById(query)
 
     res.json(task)
   }
 
   update = async (req: Request, res: Response) => {
-    const command = new UpdateTaskCommand(
-      req.params.id,
-      req.user!.id,
-      req.user!.role,
-      {
-        title: req.body.title,
-        description: req.body.description!,
-        status: req.body.status
-      }
-    )
-
-    await this.updateTaskCommandHandler.execute(command)
+    await this.taskApplicationService.updateTask({
+      taskId: req.params.id,
+      title: req.body.title,
+      description: req.body.description!,
+      status: req.body.status
+    })
 
     res.json({ message: 'Task updated' })
   }
 
   delete = async (req: Request, res: Response) => {
-    const command = new DeleteTaskCommand(
-      req.params.id,
-      req.user!.id,
-      req.user!.role
-    )
-
-    await this.deleteTaskCommandHandler.execute(command)
+    await this.taskApplicationService.deleteTask({
+      taskId: req.params.id
+    })
 
     res.status(204).send()
   }

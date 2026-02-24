@@ -8,7 +8,10 @@ import { Result } from '@/shared/domain/Result'
 import { ErrorCodes } from '@/shared/application/ErrorCodes'
 import { DomainEventDispatcher } from '@/shared/domain/DomainEventDispatcher'
 import { ICommandHandler } from '@/shared/application/command-bus/ICommandHandler'
-export class CreateTaskCommand {
+import { ICommand } from '@/shared/application/command-bus/ICommand'
+export class CreateTaskCommand
+  implements ICommand<Result<ICreateTaskResponseDTO>> {
+    
   constructor(
     public readonly data: ICreateTaskRequestDTO
   ) { }
@@ -42,9 +45,10 @@ export class CreateTaskCommandHandler
 
     await this.taskRepository.save(task)
 
-    await DomainEventDispatcher.dispatchAll(task.domainEvents)
+    await unitOfWork.registerAggregate(task)
+    // await DomainEventDispatcher.dispatchAll(task.domainEvents)
 
-    task.clearDomainEvents()
+    // task.clearDomainEvents()
 
     //await this.eventBus.publish(task.domainEvents)
 

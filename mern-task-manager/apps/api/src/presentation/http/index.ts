@@ -4,46 +4,41 @@ import express from 'express'
 
 import { authMiddleware } from './middlewares/auth.middleware'
 import { errorMiddleware } from './middlewares/error.middleware'
-import { BrokerEventBus } from '../shared/infrastructure/event-bus/BrokerEventBus'
-import { OutboxProcessor } from '../shared/infrastructure/Outbox/OutboxProcessor'
-import { TaskCreationSaga } from '../saga/application/TaskCreationSaga'
-import { SagaRegistry } from '../saga/infrastructure/SagaRegistry'
+import { BrokerEventBus } from '../../shared/infrastructure/event-bus/BrokerEventBus'
+import { OutboxProcessor } from '../../shared/infrastructure/Outbox/OutboxProcessor'
+import { TaskCreationSaga } from '../../saga/application/TaskCreationSaga'
+import { SagaRegistry } from '../../saga/infrastructure/SagaRegistry'
 
 import { healthRouter } from './routes/health.routes'
 import { createAuthRouter } from './routes/auth.routes'
 import { createUsersRouter } from './routes/users.routes'
+
 import { taskRouters } from '@/modules/task/api/task.routes'
 
 import { RegisterUserController } from './controllers/RegisterUserController'
-import { RegisterUserHandler } from '../application/users/RegisterUserHandler'
-import { MongoUserRepository } from '../infrastructure/repositories/MongoUserRepository'
-import { BcryptPasswordHasher } from '../infrastructure/security/BcryptPasswordHasher'
-import { GetUserByIdHandler } from '../application/users/queries/GetUserByIdHandler'
+import { RegisterUserHandler } from '../../application/users/RegisterUserHandler'
+import { MongoUserRepository } from '../../infrastructure/db/repositories/MongoUserRepository'
+import { BcryptPasswordHasher } from '../../infrastructure/security/BcryptPasswordHasher'
+import { GetUserByIdHandler } from '../../application/users/queries/GetUserByIdHandler'
 import { GetUserByIdController } from './controllers/GetUserByIdController'
-import { ListUsersHandler } from '../application/users/queries/ListUsersHandler'
+import { ListUsersHandler } from '../../application/users/queries/ListUsersHandler'
 import { ListUsersController } from './controllers/ListUsersController'
-import { UpdateUserHandler } from '../application/users/commands/UpdateUserHandler'
+import { UpdateUserHandler } from '../../application/users/commands/UpdateUserHandler'
 import { UpdateUserController } from './controllers/UpdateUserController'
-import { SoftDeleteUserHandler } from '../application/users/commands/SoftDeleteUserHandler'
+import { SoftDeleteUserHandler } from '../../application/users/commands/SoftDeleteUserHandler'
 import { SoftDeleteUserController } from './controllers/SoftDeleteUserController'
-import { JwtTokenService } from '../infrastructure/security/JwtTokenService'
-import { LoginHandler } from '../application/auth/commands/LoginHandler'
+import { JwtTokenService } from '../../infrastructure/security/JwtTokenService'
+import { LoginHandler } from '../../application/auth/commands/LoginHandler'
 import { LoginController } from './controllers/LoginController'
-import { JwtTokenVerifier } from '../infrastructure/security/JwtTokenVerifier'
-import { MongoTaskRepository } from '../modules/task/infrastructure/repositories/MongoTaskRepository'
-import { TaskController } from '@/modules/task/api/TaskController'
-import { CreateTaskCommandHandler } from '../modules/task/application/commands/CreateTaskCommand'
-import { UpdateTaskCommandHandler } from '../modules/task/application/commands/UpdateTaskCommand'
-import { DeleteTaskCommandHandler } from '../modules/task/application/commands/DeleteTaskCommand'
-import { ListMyTasksQueryHandler } from '../modules/task/application/queries/ListMyTasksQuery'
-import { GetTaskByIdQueryHandler } from '../modules/task/application/queries/GetTaskByIdQuery'
-import { MongoJobQueue } from '../infrastructure/job-queue/MongoJobQueue'
-import { JobWorker } from '../infrastructure/job-queue/JobWorker'
+import { JwtTokenVerifier } from '../../infrastructure/security/JwtTokenVerifier'
+
+import { MongoJobQueue } from '../../infrastructure/job-queue/MongoJobQueue'
+import { JobWorker } from '../../infrastructure/job-queue/JobWorker'
 import { RequestContext } from '@/shared/infrastructure/RequestContext'
 import { RequestCurrentUserProvider } from '@/shared/infrastructure/RequestCurrentUserProvider'
-import { registerTaskModuleEvents } from '@/modules/task'
+import { ITaskModule } from '@/modules/task/application/ports/inbound/ITaskModule'
 
-export function createServer() {
+export function createServer(taskModule: ITaskModule) {
   const app = express()
   app.use(express.json())
 
@@ -55,7 +50,6 @@ export function createServer() {
 
   // dependencies
   const userRepository = new MongoUserRepository()
-  const taskRepository = new MongoTaskRepository()
   const passwordHasher = new BcryptPasswordHasher()
   const tokenService = new JwtTokenService(jwtSecret)
   const tokenVerifier = new JwtTokenVerifier(jwtSecret)
@@ -67,8 +61,6 @@ export function createServer() {
   const currentUser = new RequestCurrentUserProvider()
 
   const auth = authMiddleware(tokenVerifier)
-
-  registerTaskModuleEvents()
 
   const eventBus = new BrokerEventBus()
 
@@ -119,19 +111,6 @@ export function createServer() {
     passwordHasher,
     tokenService
   )
-  const createTaskCommandHandler = new CreateTaskCommandHandler(
-    taskRepository,
-    currentUser,
-    // eventBus
-  )
-  const listMyTasksQueryHandler = new ListMyTasksQueryHandler(taskRepository)
-  const getTaskByIdQueryHandler = new GetTaskByIdQueryHandler(taskRepository)
-  const updateTaskCommandHandler = new UpdateTaskCommandHandler(
-    taskRepository,
-    currentUser,
-    // eventBus
-  )
-  const deleteTaskCommandHandler = new DeleteTaskCommandHandler(taskRepository)
 
   // controllers
   const registerUserController = new RegisterUserController(
@@ -147,13 +126,7 @@ export function createServer() {
   )
 
   const loginController = new LoginController(loginHandler)
-  const taskController = new TaskController(
-    createTaskCommandHandler,
-    updateTaskCommandHandler,
-    DeleteTaskCommandHandler,
-    listMyTasksQueryHandler,
-    getTaskByIdQueryHandler
-  )
+
 
   // routes
   app.use('/health', healthRouter)
@@ -167,12 +140,7 @@ export function createServer() {
     )
   )
 
-  app.use('/tasks',
-    taskRouters(
-      taskController,
-      tokenVerifier
-    )
-  )
+  app.use('/tasks', taskModule.router)
 
   app.use('/auth',
     createAuthRouter(

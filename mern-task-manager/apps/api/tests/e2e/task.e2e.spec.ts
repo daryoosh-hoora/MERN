@@ -1,6 +1,6 @@
 import request from 'supertest'
 import mongoose from 'mongoose'
-import { createServer } from '@/http/index'
+import { createServer } from '@/presentation/http/index'
 import { initInfrastructure, shutdownInfrastructure } from '@/infrastructure/index'
 
 describe('Task E2E', () => {

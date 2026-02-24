@@ -2,10 +2,10 @@ import { Task } from '../../domain/entities/Task'
 import { ITaskRepository } from '../../domain/repositories/ITaskRepository'
 import { NotFoundError } from '@/shared/errors/NotFoundError'
 import { ForbiddenError } from '@/shared/errors/ForbiddenError'
+import { ICurrentUserProvider } from '@/shared/application/ICurrentUserProvider'
 
-export class ListMyTasksQuery {
+export class GetAllTasksQuery {
   constructor(
-    public readonly ownerId: string,
     public readonly limit: number,
     public readonly offset: number,
     public readonly status?: TaskStatusEnum,
@@ -14,21 +14,28 @@ export class ListMyTasksQuery {
   ) {}
 }
 
-export class ListMyTasksQueryHandler {
+export class GetAllTasksQueryHandler {
   constructor(
-    private readonly taskRepository: ITaskRepository
+    private readonly taskRepository: ITaskRepository,
+    private readonly currentUser: ICurrentUserProvider
   ) { }
 
-  async execute(query: ListMyTasksQuery) {
+  async execute(query: GetAllTasksQuery) {
+    const userId = this.currentUser.getUserId()
+
+    if (!userId) {
+      throw new ForbiddenError()
+    }
+
     const [tasks, total] = await Promise.all([
-      this.taskRepository.findByOwner(query.ownerId, {
+      this.taskRepository.findByOwner(userId, {
         limit: query.limit,
         offset: query.offset,
         status: query.status,
         sortField: query.sortField,
         sortDirection: query.sortDirection
       }),
-      this.taskRepository.countByOwner(query.ownerId, query.status)
+      this.taskRepository.countByOwner(userId, query.status)
     ])
 
     return {

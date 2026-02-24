@@ -4,7 +4,7 @@ import { MongoTaskRepository } from '@/infrastructure/repositories/MongoTaskRepo
 import { CreateTaskHandler } from '@/application/tasks/commands/CreateTaskHandler'
 import { CreateTaskCommand } from '@/application/tasks/commands/CreateTaskCommand'
 import { InMemoryEventBus } from '@/shared/infrastructure/event-bus/InMemoryEventBus'
-import { env } from '@/config/env'
+import { env } from '@/infrastructure/config/env'
 
 describe('Task Integration', () => {
 

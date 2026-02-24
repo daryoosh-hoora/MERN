@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { TokenVerifier } from '../../application/security/TokenVerifier'
+import { TokenVerifier } from '../../../application/security/TokenVerifier'
 import { RequestContext } from '@/shared/infrastructure/RequestContext'
 
 export const authMiddleware = (

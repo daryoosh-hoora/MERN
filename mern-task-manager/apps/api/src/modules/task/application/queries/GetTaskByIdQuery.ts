@@ -8,8 +8,7 @@ import { IGetTaskByIdResponseDTO } from '../dto/IGetTaskByIdResponseDTO'
 import { ICurrentUserProvider } from '@/shared/application/ICurrentUserProvider'
 export class GetTaskByIdQuery implements IQuery<IGetTaskByIdResponseDTO> {
   constructor(
-    public readonly taskId: string,
-    public readonly requesterRole: string
+    public readonly taskId: string
   ) { }
 }
 
@@ -34,9 +33,7 @@ export class GetTaskByIdQueryHandler
       throw new NotFoundError('Task not found')
     }
 
-    const isAdmin = query.requesterRole === 'admin'
-
-    if (!task.isOwnedBy(userId) && !isAdmin) {
+    if (!task.isOwnedBy(userId)) {
       throw new ForbiddenError()
     }
 

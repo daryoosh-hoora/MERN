@@ -1,7 +1,7 @@
 import { connectMongo, disconnectMongo } from './db/mongo'
 import { createRedisClient } from './cache/redis'
-import { MongoUserRepository } from './repositories/MongoUserRepository'
-import { env } from '../config/env'
+import { MongoUserRepository } from './db/repositories/MongoUserRepository'
+import { env } from './config/env'
 
 export async function initInfrastructure() {
   await connectMongo(env.mongoUri)

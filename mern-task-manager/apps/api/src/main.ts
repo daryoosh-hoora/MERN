@@ -1,11 +1,14 @@
-import { createServer } from './http/index'
+import { env } from './infrastructure/config/env'
+import { createServer } from './presentation/http/index'
 import { initInfrastructure } from './infrastructure/index'
-import { env } from './config/env'
+import { createTaskModule } from './modules/task/index'
 
 async function bootstrap() {
   await initInfrastructure()
-
-  const app = createServer()
+  
+  const taskModule = await createTaskModule()
+  
+  const app = createServer(taskModule)
 
   app.listen(env.port, () => {
     console.log(`🚀 API running on http://localhost:${env.port}`)

@@ -1,3 +1,1 @@
-export interface ICommand {
-  // marker interface
-}
+export interface ICommand<TResult = void> {}

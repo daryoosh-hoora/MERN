@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { UpdateUserHandler } from '../../application/users/commands/UpdateUserHandler'
+import { UpdateUserHandler } from '../../../application/users/commands/UpdateUserHandler'
 
 export class UpdateUserController {
   constructor(private readonly handler: UpdateUserHandler) {}

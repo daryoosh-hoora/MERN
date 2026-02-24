@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { env } from '@/config/env'
+import { env } from '@/infrastructure/config/env'
 import { MongoJobQueue } from '@/infrastructure/job-queue/MongoJobQueue'
 import { JobWorker } from '@/infrastructure/job-queue/JobWorker'
 
