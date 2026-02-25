@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
-import { TokenService } from '../../application/security/TokenService'
+import { ITokenService } from '@/shared/application/security/ITokenService'
 
-export class JwtTokenService implements TokenService {
+export class JwtTokenService implements ITokenService {
   constructor(
     private readonly secret: string,
     private readonly expiresIn: jwt.SignOptions['expiresIn'] = '1h'

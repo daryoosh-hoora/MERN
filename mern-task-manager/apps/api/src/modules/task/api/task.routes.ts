@@ -1,13 +1,13 @@
 import { Router } from 'express'
 import { TaskController } from './TaskController'
 import { authMiddleware } from '@/presentation/http/middlewares/auth.middleware'
-import { TokenVerifier } from '@/shared/application/security/TokenVerifier'
+import { ITokenVerifier } from '@/shared/application/security/ITokenVerifier'
 import { validate } from '@/presentation/http/middlewares/validate.middleware'
 import { createTaskSchema, updateTaskSchema } from '@/presentation/http/validators/task.schemas'
 
 export function createTaskRouter(
   controller: TaskController,
-  tokenVerifier: TokenVerifier
+  tokenVerifier: ITokenVerifier
 ): Router {
   const router = Router()
 
@@ -21,7 +21,7 @@ export function createTaskRouter(
   router.get(
     '/',
     authMiddleware(tokenVerifier),
-    controller.list
+    controller.getAll
   )
 
   router.get(

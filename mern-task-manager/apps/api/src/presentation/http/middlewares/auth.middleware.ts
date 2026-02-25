@@ -2,14 +2,10 @@ import { Request, Response, NextFunction } from 'express'
 import { TokenVerifier } from '../../../application/security/TokenVerifier'
 import { RequestContext } from '@/shared/infrastructure/RequestContext'
 
-export const authMiddleware = (
-  tokenVerifier: TokenVerifier
-) => {
-  return async (
-    req: Request,
+export function authMiddleware(tokenVerifier: TokenVerifier) {
+  return async (req: Request,
     res: Response,
-    next: NextFunction
-  ) => {
+    next: NextFunction) => {
     try {
       const authHeader = req.headers.authorization
 

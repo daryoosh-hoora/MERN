@@ -13,12 +13,10 @@ import { healthRouter } from './routes/health.routes'
 import { createAuthRouter } from './routes/auth.routes'
 import { createUsersRouter } from './routes/users.routes'
 
-import { taskRouters } from '@/modules/task/api/task.routes'
-
 import { RegisterUserController } from './controllers/RegisterUserController'
 import { RegisterUserHandler } from '../../application/users/RegisterUserHandler'
 import { MongoUserRepository } from '../../infrastructure/db/repositories/MongoUserRepository'
-import { BcryptPasswordHasher } from '../../infrastructure/security/BcryptPasswordHasher'
+import { BcryptPasswordHasher } from '../../shared/infrastructure/security/BcryptPasswordHasher'
 import { GetUserByIdHandler } from '../../application/users/queries/GetUserByIdHandler'
 import { GetUserByIdController } from './controllers/GetUserByIdController'
 import { ListUsersHandler } from '../../application/users/queries/ListUsersHandler'
@@ -27,10 +25,10 @@ import { UpdateUserHandler } from '../../application/users/commands/UpdateUserHa
 import { UpdateUserController } from './controllers/UpdateUserController'
 import { SoftDeleteUserHandler } from '../../application/users/commands/SoftDeleteUserHandler'
 import { SoftDeleteUserController } from './controllers/SoftDeleteUserController'
-import { JwtTokenService } from '../../infrastructure/security/JwtTokenService'
+import { JwtTokenService } from '../../shared/infrastructure/security/JwtTokenService'
 import { LoginHandler } from '../../application/auth/commands/LoginHandler'
 import { LoginController } from './controllers/LoginController'
-import { JwtTokenVerifier } from '../../infrastructure/security/JwtTokenVerifier'
+import { JwtTokenVerifier } from '../../shared/infrastructure/security/JwtTokenVerifier'
 
 import { MongoJobQueue } from '../../infrastructure/job-queue/MongoJobQueue'
 import { JobWorker } from '../../infrastructure/job-queue/JobWorker'
@@ -140,7 +138,7 @@ export function createServer(taskModule: ITaskModule) {
     )
   )
 
-  app.use('/tasks', taskModule.router)
+  app.use('/tasks', auth, taskModule.router)
 
   app.use('/auth',
     createAuthRouter(

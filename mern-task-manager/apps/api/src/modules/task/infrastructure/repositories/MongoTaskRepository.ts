@@ -5,13 +5,14 @@ import { TaskStatus } from "../../domain/value-objects/TaskStatus"
 import { TaskTitle } from "../../domain/value-objects/TaskTitle"
 import { TaskModel } from '../models/TaskModel'
 import { OutboxModel } from '@/shared/infrastructure/mongo/OutboxModel'
+import { UniqueEntityId } from '@/shared/domain/UniqueEntityId'
 
-//type TaskModel<Task> = Task & Document
+type TaskModel<Task> = Task & Document
 
 export class MongoTaskRepository implements ITaskRepository {
 
   private toDomain(document: TaskModel<Task>): Task {
-    return Task.rehydrate(document.id, {
+    return Task.rehydrate(document._id, {
       title: document.title,
       description: document.description,
       status: document.status,
@@ -110,7 +111,7 @@ export class MongoTaskRepository implements ITaskRepository {
     // No transaction for test
     // if (process.env.NODE_ENV === 'test') {
       await TaskModel.create({
-        _id: task.id,
+        // _id: task.id,
         title: task.title.value,
         description: task.description!.value,
         status: task.status.value,

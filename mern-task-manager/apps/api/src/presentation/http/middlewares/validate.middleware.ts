@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { ZodSchema } from 'zod'
 import { ValidationError } from '../../../shared/errors/ValidationError'
 
-export const validate = (schema: ZodSchema) => {
+export function validate(schema: ZodSchema) {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body)
 
@@ -11,6 +11,7 @@ export const validate = (schema: ZodSchema) => {
     }
 
     req.body = result.data
+    
     next()
   }
 }

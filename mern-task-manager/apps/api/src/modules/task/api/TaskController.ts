@@ -37,7 +37,7 @@ export class TaskController {
 
   }
 
-  list = async (req: Request, res: Response) => {
+  getAll = async (req: Request, res: Response): Promise<void> => {
     const ownerId = req.user!.id
 
     const limit = Math.min(Number(req.query.limit) || 10, 100)

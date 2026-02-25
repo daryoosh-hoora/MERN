@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
-import { TokenVerifier } from '../../application/security/TokenVerifier'
+import { ITokenVerifier } from '@/shared/application/security/ITokenVerifier'
 
-export class JwtTokenVerifier implements TokenVerifier {
+export class JwtTokenVerifier implements ITokenVerifier {
   constructor(private readonly secret: string) {}
 
   verify(token: string): {
