@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
 
+import { ErrorCodes } from '@/shared/application/ErrorCodes'
+
 import { GetAllTasksQuery } from '../application/queries/GetAllTasksQuery'
 import { GetTaskByIdQuery } from '../application/queries/GetTaskByIdQuery'
-import { ErrorCodes } from '@/shared/application/ErrorCodes'
 import { ITaskApplicationService } from '../application/ports/inbound/ITaskApplicationService'
 
 export class TaskController {
@@ -34,7 +35,6 @@ export class TaskController {
     return res.status(201).json({
       id: result.value
     })
-
   }
 
   getAll = async (req: Request, res: Response): Promise<void> => {
@@ -82,20 +82,46 @@ export class TaskController {
   }
 
   update = async (req: Request, res: Response) => {
-    await this.taskApplicationService.updateTask({
+    const result = await this.taskApplicationService.updateTask({
       taskId: req.params.id,
       title: req.body.title,
       description: req.body.description!,
       status: req.body.status
     })
 
+    if (result.isFailure) {
+      switch (result.error?.code) {
+        case ErrorCodes.UNAUTHORIZED:
+          return res.status(401).json(result.error)
+
+        case ErrorCodes.VALIDATION_ERROR:
+          return res.status(400).json(result.error)
+
+        default:
+          return res.status(400).json(result.error)
+      }
+    }
+
     res.json({ message: 'Task updated' })
   }
 
   delete = async (req: Request, res: Response) => {
-    await this.taskApplicationService.deleteTask({
+    const result = await this.taskApplicationService.deleteTask({
       taskId: req.params.id
     })
+
+    if (result.isFailure) {
+      switch (result.error?.code) {
+        case ErrorCodes.UNAUTHORIZED:
+          return res.status(401).json(result.error)
+
+        case ErrorCodes.VALIDATION_ERROR:
+          return res.status(400).json(result.error)
+
+        default:
+          return res.status(400).json(result.error)
+      }
+    }
 
     res.status(204).send()
   }
