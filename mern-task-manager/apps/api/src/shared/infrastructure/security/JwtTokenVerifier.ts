@@ -6,7 +6,7 @@ export class JwtTokenVerifier implements ITokenVerifier {
 
   verify(token: string): {
     userId: string
-    role: 'user' | 'admin'
+    role: 'user' | 'admin' | 'guest'
   } {
     const decoded = jwt.verify(token, this.secret)
 
@@ -16,7 +16,7 @@ export class JwtTokenVerifier implements ITokenVerifier {
 
     return {
       userId: decoded.userId as string,
-      role: decoded.role as 'user' | 'admin'
+      role: decoded.role as 'user' | 'admin' | 'guest'
     }
   }
 }

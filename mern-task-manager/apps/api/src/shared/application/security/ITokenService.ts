@@ -1,6 +1,6 @@
 export interface ITokenService {
   generate(payload: {
     userId: string
-    role: 'user' | 'admin'
+    role: string // 'user' | 'admin' | 'guest'
   }): string
 }

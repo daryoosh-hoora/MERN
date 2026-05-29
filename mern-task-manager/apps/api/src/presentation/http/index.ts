@@ -8,35 +8,24 @@ import { BrokerEventBus } from '../../shared/infrastructure/event-bus/BrokerEven
 import { OutboxProcessor } from '../../shared/infrastructure/Outbox/OutboxProcessor'
 import { TaskCreationSaga } from '../../saga/application/TaskCreationSaga'
 import { SagaRegistry } from '../../saga/infrastructure/SagaRegistry'
-
 import { healthRouter } from './routes/health.routes'
-import { createAuthRouter } from './routes/auth.routes'
-import { createUsersRouter } from './routes/users.routes'
-
-import { RegisterUserController } from './controllers/RegisterUserController'
-import { RegisterUserHandler } from '../../application/users/RegisterUserHandler'
-import { MongoUserRepository } from '../../infrastructure/db/repositories/MongoUserRepository'
+import { MongoUserRepository } from '../../modules/user/infrastructure/persistence/mongodb/repositories/MongoUserRepository'
 import { BcryptPasswordHasher } from '../../shared/infrastructure/security/BcryptPasswordHasher'
-import { GetUserByIdHandler } from '../../application/users/queries/GetUserByIdHandler'
-import { GetUserByIdController } from './controllers/GetUserByIdController'
-import { ListUsersHandler } from '../../application/users/queries/ListUsersHandler'
-import { ListUsersController } from './controllers/ListUsersController'
-import { UpdateUserHandler } from '../../application/users/commands/UpdateUserHandler'
-import { UpdateUserController } from './controllers/UpdateUserController'
-import { SoftDeleteUserHandler } from '../../application/users/commands/SoftDeleteUserHandler'
-import { SoftDeleteUserController } from './controllers/SoftDeleteUserController'
 import { JwtTokenService } from '../../shared/infrastructure/security/JwtTokenService'
-import { LoginHandler } from '../../application/auth/commands/LoginHandler'
-import { LoginController } from './controllers/LoginController'
 import { JwtTokenVerifier } from '../../shared/infrastructure/security/JwtTokenVerifier'
-
-import { MongoJobQueue } from '../../infrastructure/job-queue/MongoJobQueue'
-import { JobWorker } from '../../infrastructure/job-queue/JobWorker'
+import { MongoJobQueue } from '../../shared/infrastructure/job-queue/MongoJobQueue'
+import { JobWorker } from '../../shared/infrastructure/job-queue/JobWorker'
 import { RequestContext } from '@/shared/infrastructure/RequestContext'
 import { RequestCurrentUserProvider } from '@/shared/infrastructure/RequestCurrentUserProvider'
 import { ITaskModule } from '@/modules/task/application/ports/inbound/ITaskModule'
+import { IUserModule } from '@/modules/user/application/ports/inbound/IUserModule'
+import { IAuthenticationModule } from '@/modules/auth/authentication/application/ports/inbound/IAuthenticationModule'
 
-export function createServer(taskModule: ITaskModule) {
+export function createServer(
+  taskModule: ITaskModule, 
+  userModule: IUserModule,
+  authenticationModule: IAuthenticationModule
+) {
   const app = express()
   app.use(express.json())
 
@@ -95,57 +84,26 @@ export function createServer(taskModule: ITaskModule) {
 
   sagaRegistry.register()
 
-  // handlers
-  const registerUserHandler = new RegisterUserHandler(
-    userRepository,
-    passwordHasher
-  )
-  const getUserByIdHandler = new GetUserByIdHandler(userRepository)
-  const listUsersHandler = new ListUsersHandler(userRepository)
-  const updateUserHandler = new UpdateUserHandler(userRepository)
-  const softDeleteUserHandler = new SoftDeleteUserHandler(userRepository)
-  const loginHandler = new LoginHandler(
-    userRepository,
-    passwordHasher,
-    tokenService
-  )
-
-  // controllers
-  const registerUserController = new RegisterUserController(
-    registerUserHandler
-  )
-  const getUserByIdController = new GetUserByIdController(
-    getUserByIdHandler
-  )
-  const listUsersController = new ListUsersController(listUsersHandler)
-  const updateUserController = new UpdateUserController(updateUserHandler)
-  const softDeleteUserController = new SoftDeleteUserController(
-    softDeleteUserHandler
-  )
-
-  const loginController = new LoginController(loginHandler)
-
-
   // routes
   app.use('/health', healthRouter)
-  app.use('/users',
-    auth,
-    createUsersRouter(
-      getUserByIdController,
-      listUsersController,
-      updateUserController,
-      softDeleteUserController
-    )
-  )
-
+  // app.use('/users',
+  //   auth,
+  //   createUsersRouter(
+  //     getUserByIdController,
+  //     listUsersController,
+  //     updateUserController,
+  //     softDeleteUserController
+  //   )
+  // )
+  app.use('/auth', authenticationModule.router)
+  app.use('/users', userModule.router)
   app.use('/tasks', auth, taskModule.router)
 
-  app.use('/auth',
-    createAuthRouter(
-      registerUserController,
-      loginController
-    )
-  )
+  // app.use('/auth',
+  //   createAuthRouter(
+  //     loginController
+  //   )
+  // )
 
   // 🔥 must be LAST
   app.use(errorMiddleware)

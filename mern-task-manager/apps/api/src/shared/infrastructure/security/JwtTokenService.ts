@@ -7,7 +7,10 @@ export class JwtTokenService implements ITokenService {
     private readonly expiresIn: jwt.SignOptions['expiresIn'] = '1h'
   ) {}
 
-  generate(payload: { userId: string; role: 'user' | 'admin' }): string {
+  generate(payload: { 
+    userId: string; 
+    role: 'user' | 'admin' 
+  }): string {
     return jwt.sign(payload, this.secret, {
       expiresIn: this.expiresIn
     })

@@ -1,6 +1,6 @@
-enum TaskStatusEnum {
+export enum TaskStatusEnum {
   PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
+  STARTED = 'started',
   COMPLETED = 'completed',
 }
 

@@ -1,15 +1,13 @@
 import { ITaskApplicationService } from '../../application/ports/inbound/ITaskApplicationService'
-import { CreateTaskCommand } from '../../application/commands/CreateTaskCommand'
-import { ICreateTaskResponseDTO } from '../../application/dto/ICreateTaskResponseDTO'
-import { UpdateTaskCommand } from '../../application/commands/UpdateTaskCommand'
-import { DeleteTaskCommand } from '../../application/commands/DeleteTaskCommand'
-import { ICommandBus } from '@/shared/application/command-bus/ICommandBus'
-import { IQueryBus } from '@/shared/application/query-bus/IQueryBus'
+import { CreateTaskCommand, ICreateTaskResponseDTO } from '../../application/use-cases/CreateTask'
+import { UpdateTaskCommand, IUpdateTaskResponseDTO } from '../../application/use-cases/UpdateTask'
 import { Result } from '@/shared/domain/Result'
-import { GetTaskByIdQuery } from '../../application/queries/GetTaskByIdQuery'
-import { IGetTaskByIdResponseDTO } from '../../application/dto/IGetTaskByIdResponseDTO'
-import { IUpdateTaskResponseDTO } from '../../application/dto/IUpdateTaskResponseDTO'
-import { GetAllTasksQuery } from '../../application/queries/GetAllTasksQuery'
+import { IQueryBus } from '@/shared/application/query-bus/IQueryBus'
+import { ICommandBus } from '@/shared/application/command-bus/ICommandBus'
+import { DeleteTaskCommand } from '../../application/use-cases/DeleteTask'
+import { GetTaskByIdQuery, IGetTaskByIdResponseDTO } from '../../application/use-cases/GetTaskById'
+import { GetAllTasksQuery } from '../../application/use-cases/GetAllTasks'
+import { TaskStatusEnum } from '../../domain/enums/TaskStatusEnum'
 
 export class TaskApplicationService implements ITaskApplicationService {
   constructor(
@@ -17,7 +15,10 @@ export class TaskApplicationService implements ITaskApplicationService {
     private readonly queryBus: IQueryBus
   ) { }
 
-  createTask(input: { title: string, description?: string }) {
+  createTask(input: { 
+    title: string, 
+    description?: string 
+  }): Promise<Result<ICreateTaskResponseDTO>> {
     const createTaskCommand = new CreateTaskCommand({
       title: input.title,
       description: input.description || undefined
@@ -34,7 +35,7 @@ export class TaskApplicationService implements ITaskApplicationService {
     title?: string
     description?: string
     status?: string
-  }) {
+  }): Promise<Result<IUpdateTaskResponseDTO>> {
     const updateTaskCommand = new UpdateTaskCommand({
       taskId: input.taskId,
       title: input.title || undefined,
@@ -49,7 +50,9 @@ export class TaskApplicationService implements ITaskApplicationService {
     // return this.updateTaskCommandHandler.execute(input)
   }
 
-  deleteTask(input: { taskId: string }) {
+  deleteTask(input: { 
+    taskId: string 
+  }): Promise<Result<void>> {
     const deleteTaskCommand = new DeleteTaskCommand({
       taskId: input.taskId
     })
@@ -63,7 +66,7 @@ export class TaskApplicationService implements ITaskApplicationService {
 
   getTaskById(input: {
     taskId: string
-  }) {
+  }): Promise<Result<IGetTaskByIdResponseDTO>> {
     const query = new GetTaskByIdQuery(
       input.taskId
     )
@@ -80,7 +83,7 @@ export class TaskApplicationService implements ITaskApplicationService {
     status?: TaskStatusEnum
     sortField?: string
     sortDirection?: string
-  }) {
+  }): Promise<Result<IGetTaskByIdResponseDTO>> {
     const query = new GetAllTasksQuery(
       input.limit,
       input.offset,

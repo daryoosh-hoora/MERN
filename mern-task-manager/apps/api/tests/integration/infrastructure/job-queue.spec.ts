@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
-import { env } from '@/infrastructure/config/env'
-import { MongoJobQueue } from '@/infrastructure/job-queue/MongoJobQueue'
-import { JobWorker } from '@/infrastructure/job-queue/JobWorker'
+import { env } from '@/shared/infrastructure/config/env'
+import { MongoJobQueue } from '@/shared/infrastructure/job-queue/MongoJobQueue'
+import { JobWorker } from '@/shared/infrastructure/job-queue/JobWorker'
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test'

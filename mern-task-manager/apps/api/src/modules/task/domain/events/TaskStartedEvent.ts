@@ -1,18 +1,33 @@
-import { DomainEvent } from '@/shared/domain/IDomainEvent'
+import { IDomainEvent } from '@/shared/domain/IDomainEvent'
+import { UniqueEntityId } from '@/shared/domain/UniqueEntityId'
 
-export class TaskStartedEvent extends DomainEvent {
+export class TaskStartedEvent implements IDomainEvent {
+  // public dateTimeOccurred: Date
 
-  readonly eventName = 'task.started'
-
-  constructor(
-    public readonly taskId: string
-  ) {
-    super()
+  constructor(public readonly taskId: UniqueEntityId) {
+    // this.dateTimeOccurred = new Date()
   }
 
-  toPrimitives() {
-    return {
-      taskId: this.taskId
-    }
+  getAggregateId(): UniqueEntityId {
+    return this.taskId
   }
 }
+
+// import { DomainEvent } from '@/shared/domain/DomainEvent'
+
+// export class TaskStartedEvent extends DomainEvent {
+
+//   readonly eventName = 'task.started'
+
+//   constructor(
+//     public readonly taskId: string
+//   ) {
+//     super()
+//   }
+
+//   toPrimitives() {
+//     return {
+//       taskId: this.taskId
+//     }
+//   }
+// }

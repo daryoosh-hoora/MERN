@@ -1,9 +1,9 @@
-import { MongoTaskRepository } from '../../infrastructure/repositories/MongoTaskRepository'
-import { CreateTaskCommand, CreateTaskCommandHandler } from '../../application/commands/CreateTaskCommand'
-import { UpdateTaskCommand, UpdateTaskCommandHandler } from '../../application/commands/UpdateTaskCommand'
-import { DeleteTaskCommand, DeleteTaskCommandHandler } from '../../application/commands/DeleteTaskCommand'
-import { GetTaskByIdQuery, GetTaskByIdQueryHandler } from '../../application/queries/GetTaskByIdQuery'
-import { GetAllTasksQuery, GetAllTasksQueryHandler } from '../../application/queries/GetAllTasksQuery'
+import { MongoTaskRepository } from '../persistence/mongodb/repositories/MongoTaskRepository'
+import { CreateTaskCommand, CreateTaskCommandHandler } from '../../application/use-cases/CreateTask'
+import { UpdateTaskCommand, UpdateTaskCommandHandler } from '../../application/use-cases/UpdateTask'
+import { DeleteTaskCommand, DeleteTaskCommandHandler } from '../../application/use-cases/DeleteTask'
+import { GetTaskByIdQuery, GetTaskByIdQueryHandler } from '../../application/use-cases/GetTaskById'
+import { GetAllTasksQuery, GetAllTasksQueryHandler } from '../../application/use-cases/GetAllTasks'
 import { TaskApplicationService } from '../../infrastructure/adapters/TaskApplicationService'
 import { ITaskApplicationService } from '../../application/ports/inbound/ITaskApplicationService'
 import { RequestCurrentUserProvider } from '@/shared/infrastructure/RequestCurrentUserProvider'
@@ -16,6 +16,8 @@ import { InMemoryUnitOfWork } from '@/shared/infrastructure/unit-of-work/InMemor
 import { TaskController } from '../../api/TaskController'
 import { createTaskRouter } from '../../api/task.routes'
 import { ITaskModule } from '../../application/ports/inbound/ITaskModule'
+import { JwtTokenService } from '@/shared/infrastructure/security/JwtTokenService'
+import { JwtTokenVerifier } from '@/shared/infrastructure/security/JwtTokenVerifier'
 
 // import { DomainEventDispatcher } from '@/shared/domain/DomainEventDispatcher'
 // import { TaskCreatedEvent } from './domain/events/TaskCreatedEvent'
@@ -28,6 +30,14 @@ import { ITaskModule } from '../../application/ports/inbound/ITaskModule'
 //   )
 // }
 export function createTaskModule(): Promise<ITaskModule> {
+  const jwtSecret = process.env.JWT_SECRET!
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET not defined')
+  }
+
+  const tokenService = new JwtTokenService(jwtSecret)
+  const tokenVerifier = new JwtTokenVerifier(jwtSecret)
+  
   const taskRepository = new MongoTaskRepository()
   const currentUser = new RequestCurrentUserProvider()
 
@@ -40,7 +50,7 @@ export function createTaskModule(): Promise<ITaskModule> {
   commandBus.addMiddleware(new LoggingMiddleware())
   commandBus.addMiddleware(new TransactionMiddleware(unitOfWork))
 
-  // Register command handlers
+  // register handlers
   const createTaskCommandHandler = new CreateTaskCommandHandler(taskRepository, currentUser)
 
   commandBus.register(
@@ -80,7 +90,7 @@ export function createTaskModule(): Promise<ITaskModule> {
 
   const taskController = new TaskController(taskApplicationService)
 
-  const router = createTaskRouter(taskController, new TokenVerifier())
+  const router = createTaskRouter(taskController, tokenVerifier)
 
   return {
     applicationService: taskApplicationService,

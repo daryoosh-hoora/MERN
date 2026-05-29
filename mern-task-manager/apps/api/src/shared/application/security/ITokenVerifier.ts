@@ -1,6 +1,6 @@
 export interface ITokenVerifier {
   verify(token: string): {
     userId: string
-    role: 'user' | 'admin'
+    role: 'user' | 'admin' | 'guest'
   }
 }

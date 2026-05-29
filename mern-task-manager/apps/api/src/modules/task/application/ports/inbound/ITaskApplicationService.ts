@@ -1,7 +1,8 @@
 import { Result } from '@/shared/domain/Result'
-import { ICreateTaskResponseDTO } from '../../dto/ICreateTaskResponseDTO'
-import { IUpdateTaskResponseDTO } from '../../dto/IUpdateTaskResponseDTO'
-import { IGetTaskByIdResponseDTO } from '../../dto/IGetTaskByIdResponseDTO'
+import { ICreateTaskResponseDTO } from '../../use-cases/CreateTask'
+import { IUpdateTaskResponseDTO } from '../../use-cases/UpdateTask'
+import { IGetTaskByIdResponseDTO } from '../../use-cases/GetTaskById'
+import { TaskStatusEnum } from '@/modules/task/domain/enums/TaskStatusEnum'
 
 export interface ITaskApplicationService {
   createTask(input: {
@@ -30,5 +31,5 @@ export interface ITaskApplicationService {
     status?: TaskStatusEnum
     sortField?: string
     sortDirection?: string
-  }): Promise<Result<IGetTaskByIdResponseDTO>>
+  }): Promise<Result<IGetTaskByIdResponseDTO[]>>
 }

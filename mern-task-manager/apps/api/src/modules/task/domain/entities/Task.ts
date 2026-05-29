@@ -1,16 +1,18 @@
-import { AggregateRoot } from "@/shared/domain/AggregateRoot"
-import { TaskCreatedEvent } from "../events/TaskCreatedEvent"
-import { TaskStartedEvent } from '../events/TaskStartedEvent'
-import { TaskCompletedEvent } from "../events/TaskCompletedEvents"
-import { TaskDeletedEvent } from '../events/TaskDeletedEvent'
-import { TaskTitle } from "../value-objects/TaskTitle"
-import { TaskStatus } from "../value-objects/TaskStatus"
-import { TaskDescription } from "../value-objects/TaskDescription"
 import { Result } from '@/shared/domain/Result'
+import { AggregateRoot } from '@/shared/domain/AggregateRoot'
 import { UniqueEntityId } from '@/shared/domain/UniqueEntityId'
+import { TaskCreatedEvent } from '../events/TaskCreatedEvent'
+import { TaskStartedEvent } from '../events/TaskStartedEvent'
+import { TaskCompletedEvent } from '../events/TaskCompletedEvent'
+import { TaskUpdatedEvent } from '../events/TaskUpdatedEvent'
+import { TaskDeletedEvent } from '../events/TaskDeletedEvent'
+import { TaskTitle } from '../value-objects/TaskTitle'
+import { TaskStatus } from '../value-objects/TaskStatus'
+import { TaskDescription } from '../value-objects/TaskDescription'
 import {
   TaskAlreadyStartedError,
-  TaskAlreadyCompletedError
+  TaskAlreadyCompletedError,
+  TaskAlreadyPendingError
 } from '../errors/TaskErrors'
 
 export type TaskProps = {
@@ -18,10 +20,6 @@ export type TaskProps = {
   description?: TaskDescription | null
   status: TaskStatus
   ownerId: string
-  isActive: boolean
-  createdAt: Date
-  updatedAt: Date
-  deletedAt?: Date | null
 }
 
 export class Task extends AggregateRoot<TaskProps> {
@@ -35,11 +33,7 @@ export class Task extends AggregateRoot<TaskProps> {
       title: TaskTitle.create(title),
       description: description ? TaskDescription.create(description) : null,
       status: TaskStatus.pending(),
-      ownerId: ownerId,
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null
+      ownerId: ownerId
     })
 
     task.addDomainEvent(
@@ -49,46 +43,7 @@ export class Task extends AggregateRoot<TaskProps> {
     return Result.ok(task)
   }
 
-  public delete() {
-    this.props.isActive = false
-
-    this.addDomainEvent(
-      new TaskDeletedEvent(this._id)
-    )
-  }
-
-  public static rehydrate(id: string, props: TaskProps): Task {
-    return new Task(props, new UniqueEntityId(id))
-  }
-
-  public start(): void {
-    if (this.props.status.value === 'started') {
-      throw new TaskAlreadyStartedError()
-    }
-
-    this.props.status = TaskStatus.started()
-
-    this.addDomainEvent(
-      new TaskStartedEvent(this._id)
-    )
-  }
-
-  public complete(): void {
-    if (this.props.status.value === 'completed') {
-      throw new TaskAlreadyCompletedError()
-    }
-
-    this.props.status = TaskStatus.completed()
-
-    this.addDomainEvent(
-      new TaskCompletedEvent(this._id)
-    )
-  }
-
   // getters
-  public get id(): UniqueEntityId {
-    return this._id
-  }
   public get title(): TaskTitle {
     return this.props.title
   }
@@ -101,33 +56,79 @@ export class Task extends AggregateRoot<TaskProps> {
   public get ownerId(): string {
     return this.props.ownerId
   }
-  public get isActive(): boolean {
-    return !this.props.isActive
-  }
-  public get createdAt(): Date {
-    return this.props.createdAt
-  }
-  public get updatedAt(): Date {
-    return this.props.updatedAt
-  }
-  public get deletedAt(): Date | null {
-    return this.props.deletedAt || null
-  }
 
-  isOwnedBy(userId: string): boolean {
+  public isOwnedBy(userId: string): boolean {
     return this.ownerId === userId
   }
 
   //behavior
-  updateTitle(title: string) {
-    this.props.title = TaskTitle.create(title)
+  public start(): void {
+    if (this.props.status.value === 'started') {
+      throw new TaskAlreadyStartedError()
+    }
+
+    this.props.status = TaskStatus.started()
+    this._updatedAt = new Date()
+
+    this.addDomainEvent(
+      new TaskStartedEvent(this._id)
+    )
   }
 
-  updateStatus(status: TaskStatusEnum) {
-    this.props.status = TaskStatus.from(status)
+  public complete(): void {
+    if (this.props.status.value === 'completed') {
+      throw new TaskAlreadyCompletedError()
+    }
+
+    this.props.status = TaskStatus.completed()
+    this._updatedAt = new Date()
+
+    this.addDomainEvent(
+      new TaskCompletedEvent(this._id)
+    )
+  }
+
+  public pending(): void {
+    if (this.props.status.value === 'pending') {
+      throw new TaskAlreadyPendingError()
+    }
+
+    this.props.status = TaskStatus.pending()
+    this._updatedAt = new Date()
+
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this._id)
+    )
+  }
+
+  public updateTitle(title: string) {
+    this.props.title = TaskTitle.create(title)
+    this._updatedAt = new Date()
+
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this._id)
+    )
   }
 
   updateDescription(description: string) {
     this.props.description = TaskDescription.create(description)
+    this._updatedAt = new Date()
+
+    this.addDomainEvent(
+      new TaskUpdatedEvent(this._id)
+    )
+  }
+
+  public delete() {
+    this._isActive = false
+    this._deletedAt = new Date()
+
+    this.addDomainEvent(
+      new TaskDeletedEvent(this._id)
+    )
+  }
+
+  public static rehydrate(id: string, props: TaskProps): Task {
+    return new Task(props, new UniqueEntityId(id))
   }
 }

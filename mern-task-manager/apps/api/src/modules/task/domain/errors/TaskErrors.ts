@@ -10,6 +10,12 @@ export class TaskAlreadyCompletedError extends Error {
   }
 }
 
+export class TaskAlreadyPendingError extends Error {
+  constructor() {
+    super('Task already is pending')
+  }
+}
+
 export class TaskTitleIsRequiredError extends Error {
   constructor() {
     super('Task title is required')

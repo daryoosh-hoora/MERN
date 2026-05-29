@@ -1,10 +1,9 @@
 import { Request, Response } from 'express'
-
 import { ErrorCodes } from '@/shared/application/ErrorCodes'
-
-import { GetAllTasksQuery } from '../application/queries/GetAllTasksQuery'
-import { GetTaskByIdQuery } from '../application/queries/GetTaskByIdQuery'
+import { GetAllTasksQuery } from '../application/use-cases/GetAllTasks'
+import { GetTaskByIdQuery } from '../application/use-cases/GetTaskById'
 import { ITaskApplicationService } from '../application/ports/inbound/ITaskApplicationService'
+import { TaskStatusEnum } from '../domain/enums/TaskStatusEnum'
 
 export class TaskController {
   constructor(

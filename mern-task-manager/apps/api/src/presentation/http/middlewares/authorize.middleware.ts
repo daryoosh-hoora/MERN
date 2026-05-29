@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 
 export function authorize(
-  ...allowedRoles: Array<'user' | 'admin'>
+  ...allowedRoles: Array<'user' | 'admin' | 'guest'>
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {

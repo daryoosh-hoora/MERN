@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
-import { TokenVerifier } from '../../../application/security/TokenVerifier'
+import { ITokenVerifier } from '@/shared/application/security/ITokenVerifier'
 import { RequestContext } from '@/shared/infrastructure/RequestContext'
 
-export function authMiddleware(tokenVerifier: TokenVerifier) {
+export function authMiddleware(tokenVerifier: ITokenVerifier) {
   return async (req: Request,
     res: Response,
     next: NextFunction) => {

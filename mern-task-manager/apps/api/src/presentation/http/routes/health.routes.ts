@@ -1,5 +1,5 @@
-import { Router } from 'express'
 import mongoose from 'mongoose'
+import { Router } from 'express'
 
 export const healthRouter = Router()
 
